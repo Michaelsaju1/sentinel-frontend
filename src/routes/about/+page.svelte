@@ -3,13 +3,11 @@
 		HUDPanel,
 		GlitchText,
 		TypewriterText,
-		Button,
 		Badge,
 		StatusIndicator,
 		ProgressBar,
 		HexGrid,
-		CommandLine,
-		AlertBanner
+		CommandLine
 	} from '$lib/components/ui';
 
 	const teamMembers = [
@@ -17,37 +15,37 @@
 			callsign: 'ARCHITECT',
 			role: 'System Design',
 			status: 'online' as const,
-			clearance: 'TS/SCI'
+			clearance: 'UNCLASSIFIED'
 		},
 		{
 			callsign: 'CIPHER',
 			role: 'Cryptography',
 			status: 'online' as const,
-			clearance: 'TS/SCI'
+			clearance: 'UNCLASSIFIED'
 		},
 		{
 			callsign: 'GHOST',
 			role: 'Threat Intelligence',
 			status: 'online' as const,
-			clearance: 'TOP SECRET'
+			clearance: 'UNCLASSIFIED'
 		},
 		{
 			callsign: 'VALKYRIE',
 			role: 'Incident Response',
 			status: 'warning' as const,
-			clearance: 'SECRET'
+			clearance: 'UNCLASSIFIED'
 		},
 		{
 			callsign: 'PHOENIX',
 			role: 'Recovery Ops',
 			status: 'online' as const,
-			clearance: 'TS/SCI'
+			clearance: 'UNCLASSIFIED'
 		},
 		{
 			callsign: 'SPECTER',
 			role: 'Penetration Testing',
 			status: 'offline' as const,
-			clearance: 'TOP SECRET'
+			clearance: 'UNCLASSIFIED'
 		}
 	];
 
@@ -118,7 +116,7 @@
 	</div>
 
 	<div class="relative z-10 mx-auto max-w-4xl px-4 text-center lg:px-8">
-		<Badge variant="warning" class="mb-6">CLASSIFIED // AUTHORIZED PERSONNEL ONLY</Badge>
+		<Badge variant="info" class="mb-6">UNCLASSIFIED // FOUO</Badge>
 		<h1 class="mb-4">
 			<GlitchText tag="span" class="block font-display text-4xl font-bold tracking-wider text-text-bright md:text-5xl" intensity="low">
 				MISSION BRIEF
@@ -217,7 +215,7 @@
 					</div>
 					<div class="space-y-1">
 						<p class="font-mono text-xs text-text-dim">{member.role}</p>
-						<Badge variant={member.clearance === 'TS/SCI' ? 'danger' : member.clearance === 'TOP SECRET' ? 'warning' : 'info'}>
+						<Badge variant="info">
 							{member.clearance}
 						</Badge>
 					</div>
@@ -226,14 +224,4 @@
 		</div>
 	</div>
 
-	<!-- CTA -->
-	<div class="border border-surface-border bg-surface-light/20 p-8 text-center">
-		<AlertBanner variant="info">
-			Interested in joining the SENTINEL program? Submit your credentials for review.
-		</AlertBanner>
-		<div class="mt-6 flex flex-col items-center justify-center gap-4 sm:flex-row">
-			<Button variant="primary" size="lg">Apply for Clearance</Button>
-			<Button variant="ghost" size="md">Contact Command</Button>
-		</div>
-	</div>
 </div>

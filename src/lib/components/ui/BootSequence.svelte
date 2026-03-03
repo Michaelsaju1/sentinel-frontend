@@ -142,6 +142,8 @@
 
 			// ======== Phase 5: Flash & farewell (7 - 8s) ========
 			phase = 5;
+			allSystemsOnline = false;
+			await delay(100);
 			flashVisible = true;
 			await delay(150);
 			flashVisible = false;
