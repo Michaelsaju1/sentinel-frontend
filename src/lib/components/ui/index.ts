@@ -1,4 +1,4 @@
-export { default as MatrixRain } from './MatrixRain.svelte';
+export { default as GlobeNetwork } from './GlobeNetwork.svelte';
 export { default as GlitchText } from './GlitchText.svelte';
 export { default as TypewriterText } from './TypewriterText.svelte';
 export { default as HUDPanel } from './HUDPanel.svelte';
