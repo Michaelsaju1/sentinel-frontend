@@ -1,3 +1,195 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+
+@theme {
+	--color-matrix: #00ff41;
+	--color-matrix-dim: #0d7a3a;
+	--color-matrix-dark: #052e10;
+	--color-cyber-blue: #00b8ff;
+	--color-cyber-blue-dim: #005f85;
+	--color-warning: #ff6600;
+	--color-danger: #ff0033;
+	--color-danger-dim: #7a0019;
+	--color-surface: #0a0a0a;
+	--color-surface-light: #111111;
+	--color-surface-medium: #1a1a1a;
+	--color-surface-border: #1f2f1f;
+	--color-text-primary: #c0c0c0;
+	--color-text-bright: #e0e0e0;
+	--color-text-dim: #606060;
+
+	--font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+	--font-display: 'Orbitron', sans-serif;
+}
+
+/* ===== BASE STYLES ===== */
+html {
+	scrollbar-color: var(--color-matrix-dim) var(--color-surface);
+}
+
+body {
+	background-color: var(--color-surface);
+	color: var(--color-text-primary);
+	font-family: var(--font-mono);
+	overflow-x: hidden;
+}
+
+::selection {
+	background-color: var(--color-matrix);
+	color: var(--color-surface);
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+::-webkit-scrollbar-track {
+	background: var(--color-surface);
+}
+::-webkit-scrollbar-thumb {
+	background: var(--color-matrix-dim);
+	border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+	background: var(--color-matrix);
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes flicker {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.8;
+	}
+}
+@keyframes scanline {
+	0% {
+		transform: translateY(-100%);
+	}
+	100% {
+		transform: translateY(100vh);
+	}
+}
+@keyframes glow-pulse {
+	0%,
+	100% {
+		text-shadow:
+			0 0 4px var(--color-matrix),
+			0 0 8px var(--color-matrix-dim);
+	}
+	50% {
+		text-shadow:
+			0 0 8px var(--color-matrix),
+			0 0 16px var(--color-matrix),
+			0 0 24px var(--color-matrix-dim);
+	}
+}
+@keyframes border-glow {
+	0%,
+	100% {
+		box-shadow:
+			0 0 4px var(--color-matrix-dim),
+			inset 0 0 4px rgba(0, 255, 65, 0.05);
+	}
+	50% {
+		box-shadow:
+			0 0 8px var(--color-matrix-dim),
+			0 0 16px rgba(0, 255, 65, 0.1),
+			inset 0 0 8px rgba(0, 255, 65, 0.05);
+	}
+}
+@keyframes typing-cursor {
+	0%,
+	100% {
+		border-right-color: var(--color-matrix);
+	}
+	50% {
+		border-right-color: transparent;
+	}
+}
+@keyframes glitch-1 {
+	0%,
+	100% {
+		clip-path: inset(0 0 0 0);
+		transform: translate(0);
+	}
+	20% {
+		clip-path: inset(20% 0 60% 0);
+		transform: translate(-2px, 2px);
+	}
+	40% {
+		clip-path: inset(40% 0 20% 0);
+		transform: translate(2px, -2px);
+	}
+	60% {
+		clip-path: inset(60% 0 10% 0);
+		transform: translate(-1px, 1px);
+	}
+	80% {
+		clip-path: inset(10% 0 70% 0);
+		transform: translate(1px, -1px);
+	}
+}
+@keyframes radar-sweep {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+@keyframes fade-in-up {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+@keyframes data-stream {
+	0% {
+		background-position: 0% 0%;
+	}
+	100% {
+		background-position: 0% 100%;
+	}
+}
+@keyframes pulse-ring {
+	0% {
+		transform: scale(0.8);
+		opacity: 1;
+	}
+	100% {
+		transform: scale(2);
+		opacity: 0;
+	}
+}
+
+/* ===== UTILITY CLASSES ===== */
+.text-glow {
+	text-shadow:
+		0 0 4px var(--color-matrix),
+		0 0 8px var(--color-matrix-dim);
+}
+.text-glow-blue {
+	text-shadow:
+		0 0 4px var(--color-cyber-blue),
+		0 0 8px var(--color-cyber-blue-dim);
+}
+.text-glow-pulse {
+	animation: glow-pulse 2s ease-in-out infinite;
+}
+.border-glow {
+	animation: border-glow 2s ease-in-out infinite;
+}
+.animate-fade-in-up {
+	animation: fade-in-up 0.5s ease-out forwards;
+}
