@@ -27,7 +27,7 @@
 <style>
 	.glitch-text {
 		text-shadow:
-			2px 0 var(--color-danger),
-			-2px 0 var(--color-cyber-blue);
+			2px 0 var(--color-holo-accent),
+			-2px 0 var(--color-holo-bright);
 	}
 </style>

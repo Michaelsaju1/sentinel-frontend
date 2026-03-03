@@ -172,7 +172,7 @@
 						</div>
 						<div class="flex items-center justify-between font-mono text-xs">
 							<span class="text-text-dim">IOCs This Week</span>
-							<span class="text-cyber-blue">1,832</span>
+							<span class="text-holo-accent">1,832</span>
 						</div>
 					</div>
 				</div>
@@ -195,7 +195,7 @@
 	<div class="mt-6 grid gap-6 lg:grid-cols-2">
 		<HUDPanel title="Vulnerability Tracker" variant="danger">
 			<div class="space-y-3">
-				{#each vulnerabilities as vuln}
+				{#each vulnerabilities as vuln (vuln.cve)}
 					<div class="flex items-center justify-between border-b border-surface-border pb-3 last:border-0 last:pb-0">
 						<div>
 							<div class="flex items-center gap-2">
@@ -215,7 +215,7 @@
 							<span class="font-mono text-xs text-text-dim">{vuln.component}</span>
 						</div>
 						<div class="text-right">
-							<span class="font-display text-lg {vuln.score >= 9 ? 'text-danger' : vuln.score >= 7 ? 'text-warning' : 'text-cyber-blue'}">
+							<span class="font-display text-lg {vuln.score >= 9 ? 'text-danger' : vuln.score >= 7 ? 'text-warning' : 'text-holo-accent'}">
 								{vuln.score}
 							</span>
 							<div class="font-mono text-[9px] text-text-dim">CVSS</div>
@@ -228,14 +228,14 @@
 		<!-- Intelligence Reports -->
 		<HUDPanel title="Intelligence Reports">
 			<div class="space-y-3">
-				{#each reports as report}
+				{#each reports as report (report.id)}
 					<button
 						class="flex w-full items-start justify-between border-b border-surface-border pb-3 text-left transition-colors hover:bg-surface-medium/30 last:border-0 last:pb-0"
 						onclick={() => openReport(report.id)}
 					>
 						<div class="space-y-1">
 							<div class="flex items-center gap-2">
-								<span class="font-mono text-[10px] text-matrix-dim">{report.id}</span>
+								<span class="font-mono text-[10px] text-holo-dim">{report.id}</span>
 								<Badge
 									variant={report.classification === 'TOP SECRET' ? 'danger' : report.classification === 'SECRET' ? 'warning' : 'info'}
 								>

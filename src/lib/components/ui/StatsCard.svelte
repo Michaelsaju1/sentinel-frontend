@@ -16,7 +16,7 @@
 	} = $props();
 
 	const trendColors = {
-		up: 'text-matrix',
+		up: 'text-holo',
 		down: 'text-danger',
 		neutral: 'text-text-dim'
 	};
@@ -29,11 +29,11 @@
 </script>
 
 <div
-	class="relative border border-surface-border bg-surface-light/60 p-4 transition-all hover:border-matrix-dim/50 hover:shadow-[0_0_12px_rgba(0,255,65,0.05)] {className}"
+	class="relative border border-surface-border bg-surface-light/60 p-4 transition-all hover:border-holo-dim/50 hover:shadow-[0_0_12px_rgba(0,212,255,0.05)] {className}"
 >
 	<!-- Corner accents -->
-	<div class="absolute -left-px -top-px h-2 w-2 border-l border-t border-matrix-dim/50"></div>
-	<div class="absolute -right-px -top-px h-2 w-2 border-r border-t border-matrix-dim/50"></div>
+	<div class="absolute -left-px -top-px h-2 w-2 border-l border-t border-holo-dim/50"></div>
+	<div class="absolute -right-px -top-px h-2 w-2 border-r border-t border-holo-dim/50"></div>
 
 	<div class="flex items-start justify-between">
 		<div class="space-y-1">

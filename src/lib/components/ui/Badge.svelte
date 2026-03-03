@@ -17,8 +17,8 @@
 		default: 'border-text-dim/50 text-text-dim',
 		danger: 'border-danger/50 text-danger bg-danger-dim/10',
 		warning: 'border-warning/50 text-warning bg-warning/5',
-		info: 'border-cyber-blue/50 text-cyber-blue bg-cyber-blue-dim/10',
-		success: 'border-matrix/50 text-matrix bg-matrix-dark/20'
+		info: 'border-holo-accent/50 text-holo-accent bg-holo-dark/10',
+		success: 'border-holo/50 text-holo bg-holo-dark/20'
 	};
 </script>
 

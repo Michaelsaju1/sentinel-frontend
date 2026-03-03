@@ -30,7 +30,7 @@
 	{@render children()}
 	{#if show && text}
 		<div
-			class="pointer-events-none absolute z-50 whitespace-nowrap border border-matrix-dim/50 bg-surface-light px-2.5 py-1 font-mono text-xs text-matrix shadow-[0_0_8px_rgba(0,255,65,0.1)] {positions[position]}"
+			class="pointer-events-none absolute z-50 whitespace-nowrap border border-holo-dim/50 bg-surface-light px-2.5 py-1 font-mono text-xs text-holo shadow-[0_0_8px_rgba(0,212,255,0.1)] {positions[position]}"
 			style="animation: fade-in-up 0.15s ease-out;"
 		>
 			{text}

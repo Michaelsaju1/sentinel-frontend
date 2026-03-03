@@ -41,7 +41,7 @@
 					const dist = Math.sqrt(dx * dx + dy * dy);
 					if (dist < maxDist) {
 						const alpha = (1 - dist / maxDist) * 0.3;
-						ctx!.strokeStyle = `rgba(0, 255, 65, ${alpha})`;
+						ctx!.strokeStyle = `rgba(0, 212, 255, ${alpha})`;
 						ctx!.lineWidth = 0.5;
 						ctx!.beginPath();
 						ctx!.moveTo(nodes[i].x, nodes[i].y);
@@ -56,8 +56,8 @@
 				node.pulse += 0.02;
 				const glow = (Math.sin(node.pulse) + 1) / 2;
 
-				ctx!.fillStyle = `rgba(0, 255, 65, ${0.4 + glow * 0.4})`;
-				ctx!.shadowColor = '#00ff41';
+				ctx!.fillStyle = `rgba(0, 212, 255, ${0.4 + glow * 0.4})`;
+				ctx!.shadowColor = '#00d4ff';
 				ctx!.shadowBlur = glow * 8;
 				ctx!.beginPath();
 				ctx!.arc(node.x, node.y, node.size + glow, 0, Math.PI * 2);

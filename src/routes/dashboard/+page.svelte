@@ -140,7 +140,7 @@
 			<!-- System Modules -->
 			<HUDPanel title="System Modules">
 				<div class="space-y-3">
-					{#each systemModules as mod}
+					{#each systemModules as mod (mod.name)}
 						<div class="flex items-center justify-between">
 							<StatusIndicator status={mod.status} label={mod.name} size="sm" />
 							<span class="font-mono text-[10px] tabular-nums text-text-dim">{mod.load}%</span>
@@ -159,19 +159,19 @@
 				</div>
 				<div class="mt-4 grid grid-cols-4 gap-4">
 					<div class="text-center">
-						<div class="font-display text-lg text-matrix">
+						<div class="font-display text-lg text-holo">
 							<CountUp target={2847} duration={2000} />
 						</div>
 						<div class="font-mono text-[9px] tracking-wider text-text-dim">ENDPOINTS</div>
 					</div>
 					<div class="text-center">
-						<div class="font-display text-lg text-cyber-blue">
+						<div class="font-display text-lg text-holo-accent">
 							<CountUp target={156} duration={1500} />
 						</div>
 						<div class="font-mono text-[9px] tracking-wider text-text-dim">GATEWAYS</div>
 					</div>
 					<div class="text-center">
-						<div class="font-display text-lg text-matrix">
+						<div class="font-display text-lg text-holo">
 							<CountUp target={42} duration={1800} />
 						</div>
 						<div class="font-mono text-[9px] tracking-wider text-text-dim">SEGMENTS</div>

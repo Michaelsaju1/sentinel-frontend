@@ -4,7 +4,7 @@
 	let canvas: HTMLCanvasElement;
 	let {
 		opacity = 0.08,
-		color = '#00ff41',
+		color = '#00d4ff',
 		class: className = ''
 	}: {
 		opacity?: number;

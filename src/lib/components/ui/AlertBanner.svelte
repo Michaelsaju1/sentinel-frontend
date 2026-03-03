@@ -17,9 +17,9 @@
 
 	const styles = {
 		info: {
-			border: 'border-cyber-blue/50',
-			bg: 'bg-cyber-blue-dim/10',
-			text: 'text-cyber-blue',
+			border: 'border-holo/50',
+			bg: 'bg-holo-dark/10',
+			text: 'text-holo',
 			icon: 'INFO'
 		},
 		warning: {
@@ -35,9 +35,9 @@
 			icon: 'CRIT'
 		},
 		success: {
-			border: 'border-matrix/50',
-			bg: 'bg-matrix-dark/20',
-			text: 'text-matrix',
+			border: 'border-holo/50',
+			bg: 'bg-holo-dark/20',
+			text: 'text-holo',
 			icon: ' OK '
 		}
 	};

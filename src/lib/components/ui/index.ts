@@ -19,3 +19,4 @@ export { default as HexGrid } from './HexGrid.svelte';
 export { default as ThreatMeter } from './ThreatMeter.svelte';
 export { default as NetworkGraph } from './NetworkGraph.svelte';
 export { default as CountUp } from './CountUp.svelte';
+export { default as BootSequence } from './BootSequence.svelte';

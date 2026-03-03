@@ -19,9 +19,9 @@
 
 	const variants = {
 		primary:
-			'border-matrix text-matrix hover:bg-matrix hover:text-surface hover:shadow-[0_0_12px_var(--color-matrix-dim)] active:bg-matrix/80',
+			'border-holo text-holo hover:bg-holo hover:text-surface hover:shadow-[0_0_12px_var(--color-holo-dim)] active:bg-holo/80',
 		secondary:
-			'border-cyber-blue text-cyber-blue hover:bg-cyber-blue hover:text-surface hover:shadow-[0_0_12px_var(--color-cyber-blue-dim)] active:bg-cyber-blue/80',
+			'border-holo-accent text-holo-accent hover:bg-holo-accent hover:text-surface hover:shadow-[0_0_12px_rgba(77,166,255,0.3)] active:bg-holo-accent/80',
 		danger:
 			'border-danger text-danger hover:bg-danger hover:text-surface hover:shadow-[0_0_12px_var(--color-danger-dim)] active:bg-danger/80',
 		ghost:

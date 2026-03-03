@@ -13,8 +13,12 @@
 		StatusIndicator,
 		ProgressBar,
 		Badge,
-		CountUp
+		CountUp,
+		BootSequence
 	} from '$lib/components/ui';
+
+	let bootActive = $state(false);
+	let booted = $state(false);
 
 	const terminalLines = [
 		{ type: 'input' as const, text: 'sentinel --init --mode=defense' },
@@ -26,11 +30,22 @@
 		{ type: 'output' as const, text: 'Firewall: ACTIVE | IDS: ACTIVE | Encryption: AES-256' },
 		{ type: 'success' as const, text: 'All subsystems nominal. Standing by.' }
 	];
+
+	function startBoot() {
+		bootActive = true;
+	}
+
+	function onBootComplete() {
+		bootActive = false;
+		booted = true;
+	}
 </script>
 
 <svelte:head>
 	<title>SENTINEL // Home</title>
 </svelte:head>
+
+<BootSequence active={bootActive} onComplete={onBootComplete} />
 
 <!-- Hero Section -->
 <section class="relative overflow-hidden">
@@ -39,12 +54,12 @@
 	<div class="relative z-10 mx-auto max-w-7xl px-4 py-24 lg:px-8 lg:py-36">
 		<div class="mx-auto max-w-3xl text-center">
 			<!-- Classification badge -->
-			<div class="mb-8 inline-flex items-center gap-2 border border-matrix-dim/50 bg-surface/80 px-4 py-1.5 backdrop-blur-sm">
+			<div class="mb-8 inline-flex items-center gap-2 border border-holo-dim/50 bg-surface/80 px-4 py-1.5 backdrop-blur-sm">
 				<span class="relative flex h-2 w-2">
-					<span class="absolute inline-flex h-full w-full rounded-full bg-matrix opacity-75" style="animation: pulse-ring 2s cubic-bezier(0, 0, 0.2, 1) infinite;"></span>
-					<span class="relative inline-flex h-2 w-2 rounded-full bg-matrix"></span>
+					<span class="absolute inline-flex h-full w-full rounded-full bg-holo opacity-75" style="animation: pulse-ring 2s cubic-bezier(0, 0, 0.2, 1) infinite;"></span>
+					<span class="relative inline-flex h-2 w-2 rounded-full bg-holo"></span>
 				</span>
-				<span class="font-mono text-[10px] tracking-[0.3em] text-matrix">SYSTEM ACTIVE // CLASSIFICATION: TOP SECRET</span>
+				<span class="font-mono text-[10px] tracking-[0.3em] text-holo">SYSTEM ACTIVE // CLASSIFICATION: TOP SECRET</span>
 			</div>
 
 			<!-- Title -->
@@ -52,7 +67,7 @@
 				<GlitchText tag="span" class="block font-display text-5xl font-bold tracking-wider text-text-bright md:text-7xl" intensity="low">
 					SENTINEL
 				</GlitchText>
-				<span class="mt-3 block font-mono text-lg tracking-[0.2em] text-matrix-dim md:text-xl">
+				<span class="mt-3 block font-mono text-lg tracking-[0.2em] text-holo-dim md:text-xl">
 					ADVANCED DEFENSE PLATFORM
 				</span>
 			</h1>
@@ -80,11 +95,11 @@
 	</div>
 
 	<!-- Decorative border -->
-	<div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-matrix-dim to-transparent"></div>
+	<div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-holo-dim to-transparent"></div>
 </section>
 
 <!-- Stats Section -->
-<section class="relative border-b border-surface-border bg-surface-light/30 py-12">
+<section class="relative border-b border-surface-border bg-surface-light/30 py-12" class:booted-glow={booted}>
 	<div class="mx-auto max-w-7xl px-4 lg:px-8">
 		<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 			<StatsCard
@@ -179,13 +194,13 @@
 				</div>
 				<div class="mt-4 grid grid-cols-3 gap-3">
 					<div class="text-center">
-						<div class="font-display text-xl text-matrix">
+						<div class="font-display text-xl text-holo">
 							<CountUp target={847} duration={2000} />
 						</div>
 						<div class="font-mono text-[10px] tracking-wider text-text-dim">NODES</div>
 					</div>
 					<div class="text-center">
-						<div class="font-display text-xl text-cyber-blue">
+						<div class="font-display text-xl text-holo-accent">
 							<CountUp target={2341} duration={2500} />
 						</div>
 						<div class="font-mono text-[10px] tracking-wider text-text-dim">CONNECTIONS</div>
@@ -213,8 +228,26 @@
 			spectrum threat detection awaits.
 		</p>
 		<div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
-			<Button variant="primary" size="lg">Initialize Systems</Button>
+			<Button variant="primary" size="lg" onclick={startBoot}>Initialize Systems</Button>
 			<Button variant="secondary" size="md">Request Briefing</Button>
 		</div>
 	</div>
 </section>
+
+<style>
+	.booted-glow {
+		animation: section-power-on 1.5s ease-out forwards;
+	}
+
+	@keyframes section-power-on {
+		0% {
+			box-shadow: inset 0 0 30px rgba(0, 212, 255, 0.15);
+		}
+		50% {
+			box-shadow: inset 0 0 60px rgba(0, 212, 255, 0.1);
+		}
+		100% {
+			box-shadow: none;
+		}
+	}
+</style>

@@ -8,8 +8,8 @@
 	style="
 		background: repeating-linear-gradient(
 			0deg,
-			rgba(0, 0, 0, {opacity}) 0px,
-			rgba(0, 0, 0, {opacity}) 1px,
+			rgba(0, 119, 170, {opacity}) 0px,
+			rgba(0, 119, 170, {opacity}) 1px,
 			transparent 1px,
 			transparent 2px
 		);

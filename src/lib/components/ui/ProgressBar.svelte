@@ -20,17 +20,17 @@
 	let percent = $derived(Math.min(100, Math.max(0, (value / max) * 100)));
 
 	const barColors = {
-		default: 'bg-matrix shadow-[0_0_8px_var(--color-matrix-dim)]',
+		default: 'bg-holo shadow-[0_0_8px_var(--color-holo-dim)]',
 		danger: 'bg-danger shadow-[0_0_8px_var(--color-danger-dim)]',
-		warning: 'bg-warning shadow-[0_0_8px_rgba(255,102,0,0.3)]',
-		info: 'bg-cyber-blue shadow-[0_0_8px_var(--color-cyber-blue-dim)]'
+		warning: 'bg-warning shadow-[0_0_8px_rgba(255,170,0,0.3)]',
+		info: 'bg-holo-accent shadow-[0_0_8px_rgba(77,166,255,0.3)]'
 	};
 
 	const textColors = {
-		default: 'text-matrix',
+		default: 'text-holo',
 		danger: 'text-danger',
 		warning: 'text-warning',
-		info: 'text-cyber-blue'
+		info: 'text-holo-accent'
 	};
 </script>
 

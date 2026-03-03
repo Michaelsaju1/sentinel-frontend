@@ -5,29 +5,36 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
 
 @theme {
-	--color-matrix: #00ff41;
-	--color-matrix-dim: #0d7a3a;
-	--color-matrix-dark: #052e10;
-	--color-cyber-blue: #00b8ff;
-	--color-cyber-blue-dim: #005f85;
-	--color-warning: #ff6600;
-	--color-danger: #ff0033;
-	--color-danger-dim: #7a0019;
-	--color-surface: #0a0a0a;
-	--color-surface-light: #111111;
-	--color-surface-medium: #1a1a1a;
-	--color-surface-border: #1f2f1f;
-	--color-text-primary: #c0c0c0;
-	--color-text-bright: #e0e0e0;
-	--color-text-dim: #606060;
+	/* --- Holographic Blue Palette --- */
+	--color-holo: #00d4ff;
+	--color-holo-dim: #0077aa;
+	--color-holo-dark: #001a2e;
+	--color-holo-accent: #4da6ff;
+	--color-holo-bright: #80dfff;
+	--color-holo-warm: #ff6b35;
+	--color-warning: #ffaa00;
+	--color-danger: #ff3355;
+	--color-danger-dim: #7a1a2e;
 
+	/* --- Surfaces --- */
+	--color-surface: #040a12;
+	--color-surface-light: #0a1628;
+	--color-surface-medium: #0f1f35;
+	--color-surface-border: #1a3050;
+
+	/* --- Text --- */
+	--color-text-primary: #b0c4de;
+	--color-text-bright: #e0eaf5;
+	--color-text-dim: #4a6080;
+
+	/* --- Fonts --- */
 	--font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
 	--font-display: 'Orbitron', sans-serif;
 }
 
 /* ===== BASE STYLES ===== */
 html {
-	scrollbar-color: var(--color-matrix-dim) var(--color-surface);
+	scrollbar-color: var(--color-holo-dim) var(--color-surface);
 }
 
 body {
@@ -38,7 +45,7 @@ body {
 }
 
 ::selection {
-	background-color: var(--color-matrix);
+	background-color: var(--color-holo);
 	color: var(--color-surface);
 }
 
@@ -51,11 +58,11 @@ body {
 	background: var(--color-surface);
 }
 ::-webkit-scrollbar-thumb {
-	background: var(--color-matrix-dim);
+	background: var(--color-holo-dim);
 	border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-	background: var(--color-matrix);
+	background: var(--color-holo);
 }
 
 /* ===== ANIMATIONS ===== */
@@ -80,34 +87,34 @@ body {
 	0%,
 	100% {
 		text-shadow:
-			0 0 4px var(--color-matrix),
-			0 0 8px var(--color-matrix-dim);
+			0 0 4px var(--color-holo),
+			0 0 8px var(--color-holo-dim);
 	}
 	50% {
 		text-shadow:
-			0 0 8px var(--color-matrix),
-			0 0 16px var(--color-matrix),
-			0 0 24px var(--color-matrix-dim);
+			0 0 8px var(--color-holo),
+			0 0 16px var(--color-holo),
+			0 0 24px var(--color-holo-dim);
 	}
 }
 @keyframes border-glow {
 	0%,
 	100% {
 		box-shadow:
-			0 0 4px var(--color-matrix-dim),
-			inset 0 0 4px rgba(0, 255, 65, 0.05);
+			0 0 4px var(--color-holo-dim),
+			inset 0 0 4px rgba(0, 212, 255, 0.05);
 	}
 	50% {
 		box-shadow:
-			0 0 8px var(--color-matrix-dim),
-			0 0 16px rgba(0, 255, 65, 0.1),
-			inset 0 0 8px rgba(0, 255, 65, 0.05);
+			0 0 8px var(--color-holo-dim),
+			0 0 16px rgba(0, 212, 255, 0.1),
+			inset 0 0 8px rgba(0, 212, 255, 0.05);
 	}
 }
 @keyframes typing-cursor {
 	0%,
 	100% {
-		border-right-color: var(--color-matrix);
+		border-right-color: var(--color-holo);
 	}
 	50% {
 		border-right-color: transparent;
@@ -173,16 +180,63 @@ body {
 	}
 }
 
+/* --- New Holographic Animations --- */
+@keyframes hologram-flicker {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	25% {
+		opacity: 0.96;
+	}
+	50% {
+		opacity: 0.92;
+	}
+	75% {
+		opacity: 0.98;
+	}
+}
+@keyframes holo-scan {
+	0% {
+		transform: translateY(-100%);
+		opacity: 0;
+	}
+	10% {
+		opacity: 1;
+	}
+	90% {
+		opacity: 1;
+	}
+	100% {
+		transform: translateY(100%);
+		opacity: 0;
+	}
+}
+@keyframes boot-glow {
+	0%,
+	100% {
+		box-shadow:
+			0 0 4px var(--color-holo-dim),
+			0 0 8px rgba(0, 212, 255, 0.05);
+	}
+	50% {
+		box-shadow:
+			0 0 12px var(--color-holo),
+			0 0 24px var(--color-holo-dim),
+			0 0 36px rgba(0, 212, 255, 0.15);
+	}
+}
+
 /* ===== UTILITY CLASSES ===== */
 .text-glow {
 	text-shadow:
-		0 0 4px var(--color-matrix),
-		0 0 8px var(--color-matrix-dim);
+		0 0 4px var(--color-holo),
+		0 0 8px var(--color-holo-dim);
 }
 .text-glow-blue {
 	text-shadow:
-		0 0 4px var(--color-cyber-blue),
-		0 0 8px var(--color-cyber-blue-dim);
+		0 0 4px var(--color-holo-accent),
+		0 0 8px var(--color-holo-dim);
 }
 .text-glow-pulse {
 	animation: glow-pulse 2s ease-in-out infinite;
@@ -192,4 +246,39 @@ body {
 }
 .animate-fade-in-up {
 	animation: fade-in-up 0.5s ease-out forwards;
+}
+.hologram-flicker {
+	animation: hologram-flicker 4s ease-in-out infinite;
+}
+.boot-glow {
+	animation: boot-glow 3s ease-in-out infinite;
+}
+
+/* --- Holographic Panel --- */
+.holo-panel {
+	background: linear-gradient(
+		135deg,
+		rgba(0, 212, 255, 0.04) 0%,
+		rgba(10, 22, 40, 0.8) 50%,
+		rgba(0, 119, 170, 0.04) 100%
+	);
+	border: 1px solid var(--color-surface-border);
+	box-shadow:
+		inset 0 0 20px rgba(0, 212, 255, 0.03),
+		0 0 1px var(--color-holo-dim);
+	backdrop-filter: blur(8px);
+}
+
+/* --- Holographic Line --- */
+.holo-line {
+	height: 1px;
+	background: linear-gradient(
+		90deg,
+		transparent 0%,
+		var(--color-holo-dim) 20%,
+		var(--color-holo) 50%,
+		var(--color-holo-dim) 80%,
+		transparent 100%
+	);
+	opacity: 0.6;
 }

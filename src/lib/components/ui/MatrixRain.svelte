@@ -25,9 +25,9 @@
 		}
 
 		function draw() {
-			ctx!.fillStyle = `rgba(10, 10, 10, 0.05)`;
+			ctx!.fillStyle = `rgba(4, 10, 18, 0.05)`;
 			ctx!.fillRect(0, 0, canvas.width, canvas.height);
-			ctx!.fillStyle = `rgba(0, 255, 65, ${opacity})`;
+			ctx!.fillStyle = `rgba(0, 212, 255, ${opacity})`;
 			ctx!.font = `${fontSize}px monospace`;
 
 			for (let i = 0; i < drops.length; i++) {
@@ -36,9 +36,9 @@
 				const y = drops[i] * fontSize;
 
 				if (drops[i] > 0 && drops[i] < 3) {
-					ctx!.fillStyle = `rgba(180, 255, 180, ${opacity * 2})`;
+					ctx!.fillStyle = `rgba(128, 223, 255, ${opacity * 2.5})`;
 				} else {
-					ctx!.fillStyle = `rgba(0, 255, 65, ${opacity})`;
+					ctx!.fillStyle = `rgba(0, 212, 255, ${opacity})`;
 				}
 
 				ctx!.fillText(char, x, y);

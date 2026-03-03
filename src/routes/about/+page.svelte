@@ -152,7 +152,7 @@
 		</div>
 
 		<div class="grid gap-6 md:grid-cols-2">
-			{#each capabilities as cap}
+			{#each capabilities as cap (cap.name)}
 				<HUDPanel title={cap.name}>
 					<p class="mb-4 font-mono text-xs leading-relaxed text-text-dim">{cap.desc}</p>
 					<ProgressBar value={cap.progress} label="Readiness" variant="default" />
@@ -171,21 +171,21 @@
 
 		<div class="relative">
 			<!-- Timeline line -->
-			<div class="absolute bottom-0 left-4 top-0 w-px bg-matrix-dim/30 md:left-1/2"></div>
+			<div class="absolute bottom-0 left-4 top-0 w-px bg-holo-dim/30 md:left-1/2"></div>
 
 			<div class="space-y-8">
-				{#each timeline as event, i}
+				{#each timeline as event, i (event.year)}
 					<div
 						class="relative flex gap-8 {i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}"
 						style="animation: fade-in-up 0.5s ease-out {i * 100}ms both;"
 					>
 						<!-- Dot -->
-						<div class="absolute left-4 z-10 hidden h-3 w-3 -translate-x-1/2 border border-matrix bg-surface shadow-[0_0_6px_var(--color-matrix-dim)] md:left-1/2 md:block"></div>
-						<div class="absolute left-4 z-10 h-3 w-3 -translate-x-1/2 border border-matrix bg-surface shadow-[0_0_6px_var(--color-matrix-dim)] md:hidden"></div>
+						<div class="absolute left-4 z-10 hidden h-3 w-3 -translate-x-1/2 border border-holo bg-surface shadow-[0_0_6px_var(--color-holo-dim)] md:left-1/2 md:block"></div>
+						<div class="absolute left-4 z-10 h-3 w-3 -translate-x-1/2 border border-holo bg-surface shadow-[0_0_6px_var(--color-holo-dim)] md:hidden"></div>
 
 						<!-- Content -->
 						<div class="ml-10 flex-1 md:ml-0 {i % 2 === 0 ? 'md:pr-12 md:text-right' : 'md:pl-12'}">
-							<span class="font-display text-lg text-matrix">{event.year}</span>
+							<span class="font-display text-lg text-holo">{event.year}</span>
 							<p class="mt-1 font-mono text-xs text-text-dim">{event.event}</p>
 						</div>
 						<div class="hidden flex-1 md:block"></div>
@@ -204,9 +204,9 @@
 		</div>
 
 		<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-			{#each teamMembers as member, i}
+			{#each teamMembers as member, i (member.callsign)}
 				<div
-					class="border border-surface-border bg-surface-light/40 p-4 transition-all hover:border-matrix-dim/50"
+					class="border border-surface-border bg-surface-light/40 p-4 transition-all hover:border-holo-dim/50"
 					style="animation: fade-in-up 0.4s ease-out {i * 80}ms both;"
 				>
 					<div class="mb-3 flex items-center justify-between">

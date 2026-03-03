@@ -12,7 +12,7 @@
 	} = $props();
 
 	const colors = {
-		online: { bg: 'bg-matrix', shadow: 'shadow-[0_0_6px_var(--color-matrix)]', text: 'text-matrix' },
+		online: { bg: 'bg-holo', shadow: 'shadow-[0_0_6px_var(--color-holo)]', text: 'text-holo' },
 		offline: { bg: 'bg-text-dim', shadow: '', text: 'text-text-dim' },
 		warning: { bg: 'bg-warning', shadow: 'shadow-[0_0_6px_var(--color-warning)]', text: 'text-warning' },
 		critical: { bg: 'bg-danger', shadow: 'shadow-[0_0_6px_var(--color-danger)]', text: 'text-danger' }

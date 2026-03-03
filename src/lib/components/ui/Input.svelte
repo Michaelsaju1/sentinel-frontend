@@ -19,20 +19,21 @@
 
 	const styles = {
 		default:
-			'border-surface-border bg-surface text-text-primary focus:border-matrix focus:shadow-[0_0_8px_var(--color-matrix-dim)]',
+			'border-surface-border bg-surface text-text-primary focus:border-holo focus:shadow-[0_0_8px_var(--color-holo-dim)]',
 		ghost:
-			'border-transparent bg-transparent text-text-primary focus:border-matrix-dim focus:bg-surface/50'
+			'border-transparent bg-transparent text-text-primary focus:border-holo-dim focus:bg-surface/50'
 	};
 </script>
 
 <div class="space-y-1.5 {className}">
+	<!-- svelte-ignore a11y_label_has_associated_control -->
 	{#if label}
 		<label class="block font-mono text-[10px] tracking-[0.2em] uppercase text-text-dim">
 			{label}
 		</label>
 	{/if}
 	<div class="relative">
-		<span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 font-mono text-xs text-matrix-dim"
+		<span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 font-mono text-xs text-holo-dim"
 			>&gt;</span
 		>
 		<input

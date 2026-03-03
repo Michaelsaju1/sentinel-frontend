@@ -17,12 +17,12 @@
 		if (e.key === 'Escape') open = false;
 	}
 
-	const borderColor = variant === 'danger' ? 'border-danger' : 'border-matrix-dim';
-	const headerColor = variant === 'danger' ? 'text-danger' : 'text-matrix';
+	let borderColor = $derived(variant === 'danger' ? 'border-danger' : 'border-holo-dim');
+	let headerColor = $derived(variant === 'danger' ? 'text-danger' : 'text-holo');
 </script>
 
 {#if open}
-	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+	<!-- svelte-ignore a11y_interactive_supports_focus -->
 	<div
 		class="fixed inset-0 z-[100] flex items-center justify-center p-4"
 		role="dialog"
@@ -39,7 +39,7 @@
 
 		<!-- Modal -->
 		<div
-			class="relative w-full max-w-lg border {borderColor} bg-surface-light shadow-[0_0_30px_rgba(0,255,65,0.1)]"
+			class="relative w-full max-w-lg border {borderColor} bg-surface-light shadow-[0_0_30px_rgba(0,212,255,0.1)]"
 			style="animation: fade-in-up 0.2s ease-out;"
 		>
 			<!-- Corner decorations -->

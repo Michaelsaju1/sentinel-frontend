@@ -14,18 +14,18 @@
 	const levelLabels = ['NONE', 'LOW', 'GUARDED', 'ELEVATED', 'HIGH', 'SEVERE'];
 
 	const levelColors = [
-		'text-matrix',
-		'text-cyber-blue',
-		'text-cyber-blue',
+		'text-holo',
+		'text-holo-accent',
+		'text-holo-accent',
 		'text-warning',
 		'text-warning',
 		'text-danger'
 	];
 
 	const barColors = [
-		'bg-matrix',
-		'bg-cyber-blue',
-		'bg-cyber-blue',
+		'bg-holo',
+		'bg-holo-accent',
+		'bg-holo-accent',
 		'bg-warning',
 		'bg-warning',
 		'bg-danger'
@@ -41,7 +41,7 @@
 	</div>
 
 	<div class="flex gap-1">
-		{#each Array(5) as _, i}
+		{#each Array(5) as _, i (i)}
 			<div
 				class="h-3 flex-1 border transition-all duration-300
 					{i < clamped

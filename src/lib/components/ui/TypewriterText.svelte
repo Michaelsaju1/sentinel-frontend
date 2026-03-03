@@ -43,6 +43,6 @@
 	});
 </script>
 
-<span class="font-mono text-matrix {className}">
+<span class="font-mono text-holo {className}">
 	{displayed}{#if cursor}<span class="inline-block w-2" class:opacity-0={!showCursor}>_</span>{/if}
 </span>

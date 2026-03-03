@@ -16,22 +16,22 @@
 	} = $props();
 
 	const borderColors = {
-		default: 'border-matrix-dim',
+		default: 'border-holo-dim',
 		danger: 'border-danger',
 		warning: 'border-warning',
-		info: 'border-cyber-blue'
+		info: 'border-holo-accent'
 	};
 
 	const headerColors = {
-		default: 'text-matrix bg-matrix-dark/50',
+		default: 'text-holo bg-holo-dark/50',
 		danger: 'text-danger bg-danger-dim/30',
 		warning: 'text-warning bg-warning/10',
-		info: 'text-cyber-blue bg-cyber-blue-dim/30'
+		info: 'text-holo-accent bg-holo-dark/30'
 	};
 </script>
 
 <div
-	class="relative border {borderColors[variant]} bg-surface-light/80 backdrop-blur-sm {glow
+	class="relative border {borderColors[variant]} bg-surface-light/60 backdrop-blur-sm {glow
 		? 'border-glow'
 		: ''} {className}"
 >
