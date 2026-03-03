@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/state';
 
+	let { apiStatus = 'offline' }: { apiStatus?: string } = $props();
+
 	let mobileOpen = $state(false);
 
 	const links = [
@@ -14,6 +16,14 @@
 		if (href === '/') return page.url.pathname === '/';
 		return page.url.pathname.startsWith(href);
 	}
+
+	const statusDisplay = $derived(
+		apiStatus === 'healthy'
+			? { text: 'ONLINE', color: 'bg-holo', textColor: 'text-holo' }
+			: apiStatus === 'degraded'
+				? { text: 'DEGRADED', color: 'bg-warning', textColor: 'text-warning' }
+				: { text: 'OFFLINE', color: 'bg-danger', textColor: 'text-danger' }
+	);
 </script>
 
 <nav class="hologram-flicker relative z-40 border-b border-holo-dim/30 bg-surface/90 backdrop-blur-md shadow-[0_1px_12px_rgba(0,212,255,0.08)]">
@@ -54,12 +64,12 @@
 			<div class="flex items-center gap-2 border border-surface-border bg-surface/50 px-3 py-1.5">
 				<span class="relative flex h-2 w-2">
 					<span
-						class="absolute inline-flex h-full w-full rounded-full bg-holo opacity-75"
+						class="absolute inline-flex h-full w-full rounded-full {statusDisplay.color} opacity-75"
 						style="animation: pulse-ring 2s cubic-bezier(0, 0, 0.2, 1) infinite;"
 					></span>
-					<span class="relative inline-flex h-2 w-2 rounded-full bg-holo shadow-[0_0_6px_var(--color-holo)]"></span>
+					<span class="relative inline-flex h-2 w-2 rounded-full {statusDisplay.color} shadow-[0_0_6px_var(--color-holo)]"></span>
 				</span>
-				<span class="font-mono text-[10px] tracking-wider text-holo">ONLINE</span>
+				<span class="font-mono text-[10px] tracking-wider {statusDisplay.textColor}">{statusDisplay.text}</span>
 			</div>
 		</div>
 

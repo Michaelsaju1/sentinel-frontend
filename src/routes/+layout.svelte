@@ -5,7 +5,7 @@
 	import { Footer } from '$lib/components/layout';
 	import { ScanlineOverlay } from '$lib/components/ui';
 
-	let { children } = $props();
+	let { data, children } = $props();
 </script>
 
 <svelte:head>
@@ -16,7 +16,7 @@
 <ScanlineOverlay opacity={0.02} />
 
 <div class="flex min-h-screen flex-col">
-	<NavBar />
+	<NavBar apiStatus={data.health?.status ?? 'offline'} />
 	<main class="relative flex-1">
 		{@render children()}
 	</main>

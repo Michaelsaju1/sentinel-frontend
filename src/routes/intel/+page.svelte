@@ -13,133 +13,94 @@
 		Modal
 	} from '$lib/components/ui';
 
-	let searchQuery = $state('');
-	let selectedReport = $state<string | null>(null);
-	let modalOpen = $state(false);
+	let { data } = $props();
 
-	const threatIntel = {
-		columns: [
-			{ key: 'id', label: 'ID', width: '100px' },
-			{ key: 'threat', label: 'Threat Actor' },
-			{ key: 'type', label: 'Category' },
-			{ key: 'origin', label: 'Origin' },
-			{ key: 'confidence', label: 'Confidence' },
-			{ key: 'status', label: 'Status' }
-		],
-		rows: [
-			{
-				id: 'TI-2847',
-				threat: 'APT-PHANTOM',
-				type: 'State-Sponsored',
-				origin: 'Eastern Europe',
-				confidence: '94%',
-				status: 'ACTIVE'
-			},
-			{
-				id: 'TI-2846',
-				threat: 'GHOST.SPIDER',
-				type: 'Ransomware',
-				origin: 'Unknown',
-				confidence: '87%',
-				status: 'TRACKING'
-			},
-			{
-				id: 'TI-2845',
-				threat: 'DARK.NEXUS',
-				type: 'Botnet',
-				origin: 'Southeast Asia',
-				confidence: '91%',
-				status: 'MITIGATED'
-			},
-			{
-				id: 'TI-2844',
-				threat: 'CIPHER.WORM',
-				type: 'Supply Chain',
-				origin: 'North America',
-				confidence: '78%',
-				status: 'ACTIVE'
-			},
-			{
-				id: 'TI-2843',
-				threat: 'SHADOW.BYTE',
-				type: 'Zero-Day',
-				origin: 'Central Asia',
-				confidence: '82%',
-				status: 'INVESTIGATING'
-			},
-			{
-				id: 'TI-2842',
-				threat: 'VENOM.STRIKE',
-				type: 'Phishing',
-				origin: 'West Africa',
-				confidence: '96%',
-				status: 'CONTAINED'
-			}
-		]
-	};
+	const tickerNames: Record<string, string> = data.stocks?.ticker_names ?? {};
+	const stats = data.stats;
+	const accuracyByTicker = stats?.accuracy_by_ticker ?? [];
+	const topTickers = stats?.top_tickers ?? [];
+	const totalClaims = stats?.total_claims ?? 0;
+	const exaggerated = stats?.label_distribution?.exaggerated ?? 0;
 
-	// Patchable vulnerability state
-	interface Vulnerability {
-		cve: string;
-		severity: string;
-		component: string;
-		score: number;
-		patched: boolean;
-		patching: boolean;
-	}
-
-	let vulnerabilities: Vulnerability[] = $state([
-		{ cve: 'CVE-2026-1847', severity: 'Critical', component: 'OpenSSL 3.2.x', score: 9.8, patched: false, patching: false },
-		{ cve: 'CVE-2026-1832', severity: 'High', component: 'Linux Kernel 6.x', score: 8.4, patched: false, patching: false },
-		{ cve: 'CVE-2026-1819', severity: 'Medium', component: 'nginx 1.25.x', score: 6.2, patched: false, patching: false },
-		{ cve: 'CVE-2026-1801', severity: 'High', component: 'PostgreSQL 16.x', score: 7.9, patched: false, patching: false },
-		{ cve: 'CVE-2026-1798', severity: 'Low', component: 'Redis 7.x', score: 3.1, patched: false, patching: false }
-	]);
-
-	function applyPatch(index: number) {
-		vulnerabilities[index].patching = true;
-		setTimeout(() => {
-			vulnerabilities[index].patching = false;
-			vulnerabilities[index].patched = true;
-		}, 1500 + Math.random() * 1000);
-	}
-
-	// Alert banner state - hides when OpenSSL is patched
-	let opensslPatched = $derived(vulnerabilities[0].patched);
-
-	const reports = [
-		{
-			id: 'RPT-0042',
-			title: 'Q1 2026 Threat Landscape Analysis',
-			date: '2026-03-01',
-			classification: 'UNCLASSIFIED'
-		},
-		{
-			id: 'RPT-0041',
-			title: 'APT-PHANTOM Campaign Deep Dive',
-			date: '2026-02-28',
-			classification: 'UNCLASSIFIED'
-		},
-		{
-			id: 'RPT-0040',
-			title: 'Supply Chain Attack Vector Assessment',
-			date: '2026-02-25',
-			classification: 'UNCLASSIFIED'
-		},
-		{
-			id: 'RPT-0039',
-			title: 'Zero-Day Vulnerability Briefing',
-			date: '2026-02-22',
-			classification: 'UNCLASSIFIED'
-		}
+	// Stock universe table
+	const stockColumns = [
+		{ key: 'ticker', label: 'Ticker', width: '80px' },
+		{ key: 'company', label: 'Company' },
+		{ key: 'claims', label: 'Claims', width: '80px' },
+		{ key: 'accurate', label: 'Accurate', width: '80px' },
+		{ key: 'exaggerated', label: 'Exaggerated', width: '100px' },
+		{ key: 'accuracy_pct', label: 'Accuracy %', width: '100px' }
 	];
 
-	function openReport(id: string) {
-		selectedReport = id;
-		modalOpen = true;
+	const stockRows = $derived(
+		Object.entries(tickerNames).map(([ticker, name]) => {
+			const acc = accuracyByTicker.find((a) => a.ticker === ticker);
+			return {
+				ticker,
+				company: name,
+				claims: acc?.total ?? 0,
+				accurate: acc?.accurate ?? 0,
+				exaggerated: acc?.exaggerated ?? 0,
+				accuracy_pct: acc && acc.total > 0
+					? `${((acc.accurate / acc.total) * 100).toFixed(1)}%`
+					: '—'
+			};
+		}).sort((a, b) => (b.claims as number) - (a.claims as number))
+	);
+
+	// Tweet analyzer
+	let tweetText = $state('');
+	let analyzerTicker = $state('');
+	let analyzing = $state(false);
+
+	interface AnalyzeResult {
+		label: string;
+		confidence: number;
+		ticker: string;
+		company_name: string;
+		claimed_direction: string;
+		actual_direction: string;
+		has_catalyst: boolean;
+		catalyst_type: string | null;
+		news_headlines: string[];
+		price_change_24h: number | null;
+		explanation: string;
 	}
 
-	// ===== Self-healing feed statuses =====
+	let analyzeResult: AnalyzeResult | null = $state(null);
+	let analyzeError: string | null = $state(null);
+
+	async function analyzeTweet() {
+		if (!tweetText.trim()) return;
+		analyzing = true;
+		analyzeResult = null;
+		analyzeError = null;
+
+		try {
+			const body: Record<string, string> = { tweet_text: tweetText };
+			if (analyzerTicker.trim()) body.ticker = analyzerTicker.trim().toUpperCase();
+
+			const res = await fetch('http://localhost:5000/api/analyze', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(body)
+			});
+
+			if (!res.ok) {
+				const err = await res.json();
+				analyzeError = err.error || `Error: ${res.status}`;
+				return;
+			}
+
+			analyzeResult = await res.json();
+		} catch (e) {
+			analyzeError = 'Failed to connect to API. Is the Flask server running?';
+		} finally {
+			analyzing = false;
+		}
+	}
+
+	// Self-healing feed statuses
 	interface FeedStatus {
 		label: string;
 		status: 'online' | 'warning' | 'critical';
@@ -147,11 +108,11 @@
 	}
 
 	let feeds: FeedStatus[] = $state([
-		{ label: 'OSINT Feed', status: 'online', healing: false },
-		{ label: 'Dark Web Monitor', status: 'online', healing: false },
-		{ label: 'CERT Advisory', status: 'online', healing: false },
-		{ label: 'Partner Intel', status: 'online', healing: false },
-		{ label: 'Malware Sandbox', status: 'online', healing: false }
+		{ label: 'Twitter Scraper', status: 'online', healing: false },
+		{ label: 'Price Feed', status: 'online', healing: false },
+		{ label: 'News Feed', status: 'online', healing: false },
+		{ label: 'Labeler Engine', status: 'online', healing: false },
+		{ label: 'Database', status: 'online', healing: false }
 	]);
 
 	onMount(() => {
@@ -164,7 +125,6 @@
 			const idx = onlineIndexes[Math.floor(Math.random() * onlineIndexes.length)];
 			feeds[idx].status = 'warning';
 
-			// Self-heal after 2-4s
 			setTimeout(() => {
 				feeds[idx].healing = true;
 				setTimeout(
@@ -188,6 +148,13 @@
 			clearTimeout(firstTimeout);
 		};
 	});
+
+	function labelBadgeVariant(label: string): 'danger' | 'success' | 'info' | 'default' {
+		if (label === 'exaggerated') return 'danger';
+		if (label === 'accurate') return 'success';
+		if (label === 'understated') return 'info';
+		return 'default';
+	}
 </script>
 
 <svelte:head>
@@ -202,64 +169,55 @@
 				INTELLIGENCE CENTER
 			</h1>
 			<p class="mt-1 font-mono text-xs text-text-dim">
-				Threat intelligence feeds // Analysis reports // Vulnerability tracking
+				Defense stock universe // Claim analysis // Ticker accuracy
 			</p>
 		</div>
 		<div class="flex items-center gap-3">
-			<Input bind:value={searchQuery} placeholder="Search intel..." type="search" />
-			<Button variant="primary" size="sm">Search</Button>
+			<Badge variant="info">{Object.keys(tickerNames).length} TICKERS</Badge>
+			<Badge variant="default">{totalClaims} CLAIMS</Badge>
 		</div>
 	</div>
 
-	<!-- Alert (disappears after OpenSSL is patched) -->
-	{#if !opensslPatched}
-		<div class="mb-6">
-			<AlertBanner variant="danger">
-				CRITICAL: New zero-day exploit detected targeting OpenSSL 3.2.x. Patch available. Deploy immediately.
-			</AlertBanner>
-		</div>
-	{:else}
-		<div class="mb-6">
-			<AlertBanner variant="success">
-				OpenSSL 3.2.x vulnerability patched successfully. All systems secured.
-			</AlertBanner>
-		</div>
-	{/if}
-
 	<!-- Main Grid -->
 	<div class="grid gap-6 lg:grid-cols-3">
-		<!-- Threat Intel Table -->
+		<!-- Stock Universe Table -->
 		<div class="lg:col-span-2">
-			<HUDPanel title="Active Threat Actors">
-				<DataGrid columns={threatIntel.columns} rows={threatIntel.rows} />
+			<HUDPanel title="Defense Stock Universe">
+				{#if stockRows.length > 0}
+					<DataGrid columns={stockColumns} rows={stockRows} />
+				{:else}
+					<p class="py-8 text-center font-mono text-sm text-text-dim">
+						No stock data available. Is the API running?
+					</p>
+				{/if}
 			</HUDPanel>
 		</div>
 
 		<!-- Sidebar -->
 		<div class="space-y-6">
-			<!-- Global Threat -->
-			<HUDPanel title="Global Threat Index" variant="warning">
+			<!-- Exaggeration Index -->
+			<HUDPanel title="Exaggeration Index" variant="warning">
 				<div class="space-y-4">
-					<ThreatMeter level={3} label="Current Level" />
+					<ThreatMeter level={totalClaims > 0 ? Math.min(Math.round((exaggerated / totalClaims) * 5), 5) : 0} label="Current Level" />
 					<div class="space-y-2">
 						<div class="flex items-center justify-between font-mono text-xs">
-							<span class="text-text-dim">Active Campaigns</span>
-							<span class="text-warning">14</span>
+							<span class="text-text-dim">Total Claims</span>
+							<span class="text-holo">{totalClaims}</span>
 						</div>
 						<div class="flex items-center justify-between font-mono text-xs">
-							<span class="text-text-dim">Tracked Actors</span>
-							<span class="text-text-primary">247</span>
+							<span class="text-text-dim">Exaggerated</span>
+							<span class="text-warning">{exaggerated}</span>
 						</div>
 						<div class="flex items-center justify-between font-mono text-xs">
-							<span class="text-text-dim">IOCs This Week</span>
-							<span class="text-holo-accent">1,832</span>
+							<span class="text-text-dim">Tickers Tracked</span>
+							<span class="text-holo-accent">{Object.keys(tickerNames).length}</span>
 						</div>
 					</div>
 				</div>
 			</HUDPanel>
 
-			<!-- Intel Feed Status (self-healing) -->
-			<HUDPanel title="Feed Status">
+			<!-- Feed Status -->
+			<HUDPanel title="Pipeline Status">
 				<div class="space-y-3">
 					{#each feeds as feed (feed.label)}
 						<div class="flex items-center gap-2">
@@ -274,183 +232,131 @@
 		</div>
 	</div>
 
-	<!-- Vulnerability Tracking -->
+	<!-- Bottom Row -->
 	<div class="mt-6 grid gap-6 lg:grid-cols-2">
-		<HUDPanel title="Vulnerability Tracker" variant="danger">
-			<div class="space-y-3">
-				{#each vulnerabilities as vuln, i (vuln.cve)}
-					<div
-						class="flex items-center justify-between border-b border-surface-border pb-3 last:border-0 last:pb-0"
-						class:vuln-patched={vuln.patched}
-					>
-						<div>
-							<div class="flex items-center gap-2">
-								<span class="font-mono text-sm text-text-primary">{vuln.cve}</span>
-								{#if vuln.patched}
-									<Badge variant="success">PATCHED</Badge>
-								{:else}
-									<Badge
-										variant={vuln.severity === 'Critical'
-											? 'danger'
-											: vuln.severity === 'High'
-												? 'warning'
-												: vuln.severity === 'Medium'
-													? 'info'
-													: 'default'}
-									>
-										{vuln.severity}
-									</Badge>
-								{/if}
-							</div>
-							<span class="font-mono text-xs text-text-dim">{vuln.component}</span>
-						</div>
-						<div class="flex items-center gap-3">
-							{#if !vuln.patched}
-								<button
-									class="patch-button"
-									class:patching={vuln.patching}
-									disabled={vuln.patching}
-									onclick={() => applyPatch(i)}
-								>
-									{#if vuln.patching}
-										<span class="patch-spinner"></span>
-										PATCHING
-									{:else}
-										APPLY PATCH
-									{/if}
-								</button>
-							{/if}
-							<div class="text-right">
-								<span
-									class="font-display text-lg {vuln.patched
-										? 'text-success line-through opacity-50'
-										: vuln.score >= 9
-											? 'text-danger'
-											: vuln.score >= 7
-												? 'text-warning'
-												: 'text-holo-accent'}"
-								>
-									{vuln.score}
-								</span>
-								<div class="font-mono text-[9px] text-text-dim">CVSS</div>
-							</div>
-						</div>
+		<!-- Tweet Analyzer -->
+		<HUDPanel title="Claim Analyzer">
+			<div class="space-y-4">
+				<div>
+					<label class="mb-1 block font-mono text-[10px] tracking-wider text-text-dim">TWEET TEXT</label>
+					<textarea
+						bind:value={tweetText}
+						placeholder="Paste a tweet about a defense stock..."
+						class="analyze-textarea"
+						rows="3"
+					></textarea>
+				</div>
+				<div class="flex items-end gap-3">
+					<div class="flex-1">
+						<Input bind:value={analyzerTicker} placeholder="Ticker (optional)" label="TICKER" />
 					</div>
-				{/each}
+					<Button
+						variant="primary"
+						size="sm"
+						disabled={analyzing || !tweetText.trim()}
+						onclick={analyzeTweet}
+					>
+						{analyzing ? 'ANALYZING...' : 'ANALYZE'}
+					</Button>
+				</div>
+
+				{#if analyzeError}
+					<AlertBanner variant="danger">
+						{analyzeError}
+					</AlertBanner>
+				{/if}
+
+				{#if analyzeResult}
+					<div class="border border-surface-border bg-surface p-4 space-y-3">
+						<div class="flex items-center gap-3">
+							<Badge variant={labelBadgeVariant(analyzeResult.label)}>
+								{analyzeResult.label.toUpperCase()}
+							</Badge>
+							<span class="font-mono text-xs text-text-dim">
+								{analyzeResult.ticker} — {analyzeResult.company_name}
+							</span>
+							<span class="ml-auto font-display text-lg text-holo">
+								{(analyzeResult.confidence * 100).toFixed(0)}%
+							</span>
+						</div>
+						<p class="font-mono text-xs text-text-primary">{analyzeResult.explanation}</p>
+						<div class="grid grid-cols-3 gap-2 text-center">
+							<div>
+								<div class="font-mono text-[10px] text-text-dim">CLAIMED</div>
+								<div class="font-mono text-sm text-text-primary">{analyzeResult.claimed_direction}</div>
+							</div>
+							<div>
+								<div class="font-mono text-[10px] text-text-dim">ACTUAL</div>
+								<div class="font-mono text-sm text-text-primary">{analyzeResult.actual_direction}</div>
+							</div>
+							<div>
+								<div class="font-mono text-[10px] text-text-dim">24H CHANGE</div>
+								<div class="font-mono text-sm text-text-primary">
+									{analyzeResult.price_change_24h != null ? `${analyzeResult.price_change_24h >= 0 ? '+' : ''}${analyzeResult.price_change_24h.toFixed(2)}%` : '—'}
+								</div>
+							</div>
+						</div>
+						{#if analyzeResult.news_headlines && analyzeResult.news_headlines.length > 0}
+							<div>
+								<div class="font-mono text-[10px] text-text-dim mb-1">NEWS CATALYSTS</div>
+								{#each analyzeResult.news_headlines.slice(0, 3) as headline}
+									<p class="font-mono text-xs text-text-primary">• {headline}</p>
+								{/each}
+							</div>
+						{/if}
+					</div>
+				{/if}
 			</div>
 		</HUDPanel>
 
-		<!-- Intelligence Reports -->
-		<HUDPanel title="Intelligence Reports">
+		<!-- Per-Ticker Accuracy -->
+		<HUDPanel title="Accuracy by Ticker">
 			<div class="space-y-3">
-				{#each reports as report (report.id)}
-					<button
-						class="flex w-full items-start justify-between border-b border-surface-border pb-3 text-left transition-colors hover:bg-surface-medium/30 last:border-0 last:pb-0"
-						onclick={() => openReport(report.id)}
-					>
-						<div class="space-y-1">
-							<div class="flex items-center gap-2">
-								<span class="font-mono text-[10px] text-holo-dim">{report.id}</span>
-								<Badge variant="info">
-									{report.classification}
-								</Badge>
-							</div>
-							<p class="font-mono text-sm text-text-primary">{report.title}</p>
-							<span class="font-mono text-[10px] text-text-dim">{report.date}</span>
+				{#each accuracyByTicker.slice(0, 8) as t (t.ticker)}
+					<div>
+						<div class="mb-1 flex items-center justify-between">
+							<span class="font-mono text-xs text-text-primary">{t.ticker}</span>
+							<span class="font-mono text-[10px] text-text-dim">
+								{t.accurate}/{t.total} accurate
+							</span>
 						</div>
-						<span class="font-mono text-xs text-text-dim">&gt;</span>
-					</button>
+						<ProgressBar
+							value={t.total > 0 ? Math.round((t.accurate / t.total) * 100) : 0}
+							variant={t.total > 0 && (t.accurate / t.total) >= 0.6 ? 'default' : 'warning'}
+						/>
+					</div>
 				{/each}
-			</div>
-
-			<div class="mt-4 border-t border-surface-border pt-4">
-				<Button variant="ghost" size="sm" class="w-full">View All Reports</Button>
+				{#if accuracyByTicker.length === 0}
+					<p class="py-4 text-center font-mono text-xs text-text-dim">
+						No accuracy data yet. Run the scraper to collect claims.
+					</p>
+				{/if}
 			</div>
 		</HUDPanel>
 	</div>
 </div>
 
-<!-- Report Modal -->
-<Modal bind:open={modalOpen} title="Intelligence Report">
-	{#if selectedReport}
-		<div class="space-y-4">
-			<div class="border border-surface-border bg-surface p-4">
-				<p class="font-mono text-xs text-text-dim">REPORT ID: {selectedReport}</p>
-				<p class="mt-2 font-mono text-sm text-text-primary">
-					{reports.find((r) => r.id === selectedReport)?.title}
-				</p>
-			</div>
-			<AlertBanner variant="info">
-				This document is UNCLASSIFIED // FOUO. Handle in accordance with applicable guidelines.
-			</AlertBanner>
-			<div class="space-y-2 font-mono text-xs text-text-dim">
-				<p>[EXECUTIVE SUMMARY]</p>
-				<p>
-					Analysis indicates an escalation in coordinated cyber operations targeting critical
-					infrastructure sectors. Recommend elevated monitoring posture and accelerated patch
-					deployment cycles across all protected assets.
-				</p>
-				<p class="mt-3">[FULL REPORT AVAILABLE IN SENTINEL ARCHIVE]</p>
-			</div>
-			<div class="flex justify-end gap-3 pt-2">
-				<Button variant="ghost" size="sm" onclick={() => (modalOpen = false)}>Close</Button>
-				<Button variant="primary" size="sm">Download Report</Button>
-			</div>
-		</div>
-	{/if}
-</Modal>
-
 <style>
-	.patch-button {
+	.analyze-textarea {
+		width: 100%;
 		font-family: 'JetBrains Mono', monospace;
-		font-size: 10px;
-		letter-spacing: 0.1em;
-		color: rgba(0, 212, 255, 0.9);
-		background: rgba(0, 212, 255, 0.08);
-		border: 1px solid rgba(0, 212, 255, 0.3);
-		padding: 4px 10px;
-		cursor: pointer;
-		transition: all 0.2s ease;
-		display: flex;
-		align-items: center;
-		gap: 6px;
-		white-space: nowrap;
+		font-size: 12px;
+		color: rgba(176, 196, 222, 0.9);
+		background: rgba(4, 10, 18, 0.8);
+		border: 1px solid rgba(26, 48, 80, 0.8);
+		padding: 10px 12px;
+		resize: vertical;
+		transition: border-color 0.2s ease;
 	}
 
-	.patch-button:hover:not(:disabled) {
-		background: rgba(0, 212, 255, 0.15);
-		border-color: rgba(0, 212, 255, 0.6);
-		box-shadow: 0 0 8px rgba(0, 212, 255, 0.2);
+	.analyze-textarea:focus {
+		outline: none;
+		border-color: rgba(0, 212, 255, 0.5);
+		box-shadow: 0 0 8px rgba(0, 212, 255, 0.1);
 	}
 
-	.patch-button:disabled {
-		cursor: not-allowed;
-		opacity: 0.7;
-	}
-
-	.patch-button.patching {
-		color: rgba(0, 212, 255, 0.6);
-		border-color: rgba(0, 212, 255, 0.2);
-	}
-
-	.patch-spinner {
-		display: inline-block;
-		width: 10px;
-		height: 10px;
-		border: 1.5px solid rgba(0, 212, 255, 0.3);
-		border-top-color: rgba(0, 212, 255, 0.9);
-		border-radius: 50%;
-		animation: spin 0.8s linear infinite;
-	}
-
-	@keyframes spin {
-		to {
-			transform: rotate(360deg);
-		}
-	}
-
-	.vuln-patched {
-		opacity: 0.6;
+	.analyze-textarea::placeholder {
+		color: rgba(74, 96, 128, 0.6);
 	}
 
 	.healing-badge {

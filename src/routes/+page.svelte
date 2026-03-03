@@ -18,20 +18,39 @@
 		BootSequence
 	} from '$lib/components/ui';
 
+	let { data } = $props();
+
 	// Check session storage for previous boot
 	const wasBooted = browser && sessionStorage.getItem('sentinel-booted') === 'true';
 	let awake = $state(wasBooted);
 	let bootActive = $state(false);
 	let dashboardVisible = $state(wasBooted);
 
+	const stats = data.stats;
+	const totalClaims = stats?.total_claims ?? 0;
+	const exaggerated = stats?.label_distribution?.exaggerated ?? 0;
+	const accurate = stats?.label_distribution?.accurate ?? 0;
+	const understated = stats?.label_distribution?.understated ?? 0;
+	const accuracyRate = totalClaims > 0 ? ((accurate / totalClaims) * 100).toFixed(1) : '0';
+	const topTickerCount = stats?.top_tickers?.length ?? 0;
+
 	const terminalLines = [
-		{ type: 'input' as const, text: 'sentinel --init --mode=defense' },
-		{ type: 'success' as const, text: 'Core defense systems initialized' },
-		{ type: 'input' as const, text: 'scan --target=perimeter --depth=full' },
-		{ type: 'output' as const, text: 'Scanning 2,847 endpoints...' },
-		{ type: 'success' as const, text: 'Perimeter scan complete. No breaches detected.' },
+		{ type: 'input' as const, text: 'sentinel --init --mode=defense-stock-analysis' },
+		{ type: 'success' as const, text: 'Claim analysis engine initialized' },
+		{ type: 'input' as const, text: 'scan --target=social-media --depth=full' },
+		{
+			type: 'output' as const,
+			text: `Tracking ${topTickerCount} defense tickers...`
+		},
+		{
+			type: 'success' as const,
+			text: `${totalClaims} claims analyzed. ${exaggerated} exaggerated, ${accurate} accurate, ${understated} understated.`
+		},
 		{ type: 'input' as const, text: 'status --subsystem=all' },
-		{ type: 'output' as const, text: 'Firewall: ACTIVE | IDS: ACTIVE | Encryption: AES-256' },
+		{
+			type: 'output' as const,
+			text: `Scraper: ACTIVE | Labeler: ACTIVE | Accuracy: ${accuracyRate}%`
+		},
 		{ type: 'success' as const, text: 'All subsystems nominal. Standing by.' }
 	];
 
@@ -188,10 +207,30 @@
 		<section class="border-b border-surface-border bg-surface-light/30 py-12">
 			<div class="mx-auto max-w-7xl px-4 lg:px-8">
 				<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-					<StatsCard label="Threats Blocked" value="14,892" change="12.4%" trend="up" />
-					<StatsCard label="Active Monitors" value="2,847" change="3.1%" trend="up" />
-					<StatsCard label="Response Time" value="0.3ms" change="8.2%" trend="down" />
-					<StatsCard label="Uptime" value="99.97%" change="0.01%" trend="up" />
+					<StatsCard
+						label="Claims Analyzed"
+						value={totalClaims.toLocaleString()}
+						change="{topTickerCount} tickers"
+						trend="up"
+					/>
+					<StatsCard
+						label="Exaggerated"
+						value={exaggerated.toLocaleString()}
+						change="{totalClaims > 0 ? ((exaggerated / totalClaims) * 100).toFixed(1) : '0'}%"
+						trend="up"
+					/>
+					<StatsCard
+						label="Accurate"
+						value={accurate.toLocaleString()}
+						change="{accuracyRate}%"
+						trend="up"
+					/>
+					<StatsCard
+						label="Understated"
+						value={understated.toLocaleString()}
+						change="{totalClaims > 0 ? ((understated / totalClaims) * 100).toFixed(1) : '0'}%"
+						trend="neutral"
+					/>
 				</div>
 			</div>
 		</section>
@@ -237,53 +276,52 @@
 
 				<!-- Second Row -->
 				<div class="mt-6 grid gap-6 lg:grid-cols-2">
-					<!-- Threat Assessment -->
-					<HUDPanel title="Threat Assessment">
+					<!-- Claim Analysis -->
+					<HUDPanel title="Claim Analysis">
 						<div class="space-y-5">
-							<ThreatMeter level={2} label="Global Threat Level" />
+							<ThreatMeter level={totalClaims > 0 ? Math.min(Math.round((exaggerated / totalClaims) * 5), 5) : 0} label="Exaggeration Level" />
 							<div class="space-y-3">
-								<ProgressBar value={87} label="Firewall Integrity" variant="default" />
-								<ProgressBar value={92} label="Encryption Status" variant="info" />
-								<ProgressBar value={64} label="Network Load" variant="warning" />
-								<ProgressBar value={23} label="Attack Surface" variant="danger" />
+								<ProgressBar value={totalClaims > 0 ? Math.round((accurate / totalClaims) * 100) : 0} label="Accurate Claims" variant="default" />
+								<ProgressBar value={totalClaims > 0 ? Math.round((exaggerated / totalClaims) * 100) : 0} label="Exaggerated Claims" variant="warning" />
+								<ProgressBar value={totalClaims > 0 ? Math.round((understated / totalClaims) * 100) : 0} label="Understated Claims" variant="info" />
+								<ProgressBar value={totalClaims > 0 ? Math.round(((Object.values(stats?.catalyst_type_distribution ?? {}).reduce((a: number, b: number) => a + b, 0) as number) / totalClaims) * 100) : 0} label="Catalyst Coverage" variant="danger" />
 							</div>
 							<div class="flex flex-wrap gap-2 pt-2">
-								<Badge variant="success">FIREWALL ACTIVE</Badge>
-								<Badge variant="info">IDS ENABLED</Badge>
+								<Badge variant="success">LABELER ACTIVE</Badge>
+								<Badge variant="info">SCRAPER ACTIVE</Badge>
 								<Badge variant="warning" pulse={true}>MONITORING</Badge>
-								<Badge variant="default">AES-256</Badge>
-							</div>
+								</div>
 						</div>
 					</HUDPanel>
 
-					<!-- Network Topology (Globe in small panel) -->
-					<HUDPanel title="Network Topology">
+					<!-- Ticker Coverage (Globe in small panel) -->
+					<HUDPanel title="Ticker Coverage">
 						<div class="h-64">
 							<GlobeNetwork nodeCount={30} rotationSpeed={0.003} />
 						</div>
 						<div class="mt-4 grid grid-cols-3 gap-3">
 							<div class="text-center">
 								<div class="font-display text-xl text-holo">
-									<CountUp target={847} duration={2000} />
+									<CountUp target={totalClaims} duration={2000} />
 								</div>
 								<div class="font-mono text-[10px] tracking-wider text-text-dim">
-									NODES
+									CLAIMS
 								</div>
 							</div>
 							<div class="text-center">
 								<div class="font-display text-xl text-holo-accent">
-									<CountUp target={2341} duration={2500} />
+									<CountUp target={topTickerCount} duration={1500} />
 								</div>
 								<div class="font-mono text-[10px] tracking-wider text-text-dim">
-									CONNECTIONS
+									TICKERS
 								</div>
 							</div>
 							<div class="text-center">
 								<div class="font-display text-xl text-warning">
-									<CountUp target={12} duration={1500} />
+									<CountUp target={exaggerated} duration={1800} />
 								</div>
 								<div class="font-mono text-[10px] tracking-wider text-text-dim">
-									ANOMALIES
+									FLAGGED
 								</div>
 							</div>
 						</div>
