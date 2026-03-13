@@ -88,7 +88,7 @@
 	onMount(() => {
 		if (!browser) return;
 
-		const eventSource = new EventSource('http://localhost:5000/api/feed/stream');
+		const eventSource = new EventSource('/api/feed/stream');
 
 		eventSource.onopen = () => {
 			sseConnected = true;
