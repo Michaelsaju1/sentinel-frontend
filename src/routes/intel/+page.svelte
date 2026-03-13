@@ -9,8 +9,7 @@
 		ThreatMeter,
 		AlertBanner,
 		ProgressBar,
-		StatusIndicator,
-		Modal
+		StatusIndicator
 	} from '$lib/components/ui';
 
 	let { data } = $props();
@@ -48,39 +47,31 @@
 		}).sort((a, b) => (b.claims as number) - (a.claims as number))
 	);
 
-	// Tweet analyzer
+	// Tweet predictor
 	let tweetText = $state('');
-	let analyzerTicker = $state('');
-	let analyzing = $state(false);
+	let selectedModel = $state('');
+	let predicting = $state(false);
 
-	interface AnalyzeResult {
+	interface PredictResult {
 		label: string;
-		confidence: number;
-		ticker: string;
-		company_name: string;
-		claimed_direction: string;
-		actual_direction: string;
-		has_catalyst: boolean;
-		catalyst_type: string | null;
-		news_headlines: string[];
-		price_change_24h: number | null;
-		explanation: string;
+		model: string;
+		available_models: string[];
 	}
 
-	let analyzeResult: AnalyzeResult | null = $state(null);
-	let analyzeError: string | null = $state(null);
+	let predictResult: PredictResult | null = $state(null);
+	let predictError: string | null = $state(null);
 
-	async function analyzeTweet() {
+	async function predictTweet() {
 		if (!tweetText.trim()) return;
-		analyzing = true;
-		analyzeResult = null;
-		analyzeError = null;
+		predicting = true;
+		predictResult = null;
+		predictError = null;
 
 		try {
-			const body: Record<string, string> = { tweet_text: tweetText };
-			if (analyzerTicker.trim()) body.ticker = analyzerTicker.trim().toUpperCase();
+			const body: Record<string, string> = { text: tweetText };
+			if (selectedModel.trim()) body.model = selectedModel.trim();
 
-			const res = await fetch('http://localhost:5000/api/analyze', {
+			const res = await fetch('/api/predict', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(body)
@@ -88,15 +79,15 @@
 
 			if (!res.ok) {
 				const err = await res.json();
-				analyzeError = err.error || `Error: ${res.status}`;
+				predictError = err.error || `Error: ${res.status}`;
 				return;
 			}
 
-			analyzeResult = await res.json();
-		} catch (e) {
-			analyzeError = 'Failed to connect to API. Is the Flask server running?';
+			predictResult = await res.json();
+		} catch {
+			predictError = 'Failed to connect to API. Is the backend running?';
 		} finally {
-			analyzing = false;
+			predicting = false;
 		}
 	}
 
@@ -234,8 +225,8 @@
 
 	<!-- Bottom Row -->
 	<div class="mt-6 grid gap-6 lg:grid-cols-2">
-		<!-- Tweet Analyzer -->
-		<HUDPanel title="Claim Analyzer">
+		<!-- Tweet Predictor -->
+		<HUDPanel title="Claim Predictor">
 			<div class="space-y-4">
 				<div>
 					<label class="mb-1 block font-mono text-[10px] tracking-wider text-text-dim">TWEET TEXT</label>
@@ -248,60 +239,44 @@
 				</div>
 				<div class="flex items-end gap-3">
 					<div class="flex-1">
-						<Input bind:value={analyzerTicker} placeholder="Ticker (optional)" label="TICKER" />
+						<Input bind:value={selectedModel} placeholder="Model (optional)" label="MODEL" />
 					</div>
 					<Button
 						variant="primary"
 						size="sm"
-						disabled={analyzing || !tweetText.trim()}
-						onclick={analyzeTweet}
+						disabled={predicting || !tweetText.trim()}
+						onclick={predictTweet}
 					>
-						{analyzing ? 'ANALYZING...' : 'ANALYZE'}
+						{predicting ? 'PREDICTING...' : 'PREDICT'}
 					</Button>
 				</div>
 
-				{#if analyzeError}
+				{#if predictError}
 					<AlertBanner variant="danger">
-						{analyzeError}
+						{predictError}
 					</AlertBanner>
 				{/if}
 
-				{#if analyzeResult}
+				{#if predictResult}
 					<div class="border border-surface-border bg-surface p-4 space-y-3">
 						<div class="flex items-center gap-3">
-							<Badge variant={labelBadgeVariant(analyzeResult.label)}>
-								{analyzeResult.label.toUpperCase()}
+							<Badge variant={labelBadgeVariant(predictResult.label)}>
+								{predictResult.label.toUpperCase()}
 							</Badge>
 							<span class="font-mono text-xs text-text-dim">
-								{analyzeResult.ticker} — {analyzeResult.company_name}
-							</span>
-							<span class="ml-auto font-display text-lg text-holo">
-								{(analyzeResult.confidence * 100).toFixed(0)}%
+								Model: {predictResult.model}
 							</span>
 						</div>
-						<p class="font-mono text-xs text-text-primary">{analyzeResult.explanation}</p>
-						<div class="grid grid-cols-3 gap-2 text-center">
+						{#if predictResult.available_models.length > 1}
 							<div>
-								<div class="font-mono text-[10px] text-text-dim">CLAIMED</div>
-								<div class="font-mono text-sm text-text-primary">{analyzeResult.claimed_direction}</div>
-							</div>
-							<div>
-								<div class="font-mono text-[10px] text-text-dim">ACTUAL</div>
-								<div class="font-mono text-sm text-text-primary">{analyzeResult.actual_direction}</div>
-							</div>
-							<div>
-								<div class="font-mono text-[10px] text-text-dim">24H CHANGE</div>
-								<div class="font-mono text-sm text-text-primary">
-									{analyzeResult.price_change_24h != null ? `${analyzeResult.price_change_24h >= 0 ? '+' : ''}${analyzeResult.price_change_24h.toFixed(2)}%` : '—'}
+								<div class="font-mono text-[10px] text-text-dim mb-1">AVAILABLE MODELS</div>
+								<div class="flex flex-wrap gap-2">
+									{#each predictResult.available_models as model (model)}
+										<Badge variant={model === predictResult.model ? 'info' : 'default'}>
+											{model}
+										</Badge>
+									{/each}
 								</div>
-							</div>
-						</div>
-						{#if analyzeResult.news_headlines && analyzeResult.news_headlines.length > 0}
-							<div>
-								<div class="font-mono text-[10px] text-text-dim mb-1">NEWS CATALYSTS</div>
-								{#each analyzeResult.news_headlines.slice(0, 3) as headline}
-									<p class="font-mono text-xs text-text-primary">• {headline}</p>
-								{/each}
 							</div>
 						{/if}
 					</div>
