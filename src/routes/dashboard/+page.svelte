@@ -8,7 +8,8 @@
 		Badge,
 		Button,
 		CountUp,
-		StatsCard
+		StatsCard,
+		Modal
 	} from '$lib/components/ui';
 
 	let { data } = $props();
@@ -149,7 +150,7 @@
 				: '—',
 			ticker: c.ticker ?? '—',
 			user: `@${c.username ?? '?'}`,
-			text: c.text ? (c.text.length > 60 ? c.text.substring(0, 60) + '...' : c.text) : '—',
+			text: c.text ? (c.text.length > 80 ? c.text.substring(0, 80) + '…' : c.text) : '—',
 			label: c.label ? c.label.toUpperCase() : '—',
 			direction: `${c.claimed_direction ?? '?'} → ${c.actual_direction ?? '?'}`,
 			price_change:
@@ -162,6 +163,15 @@
 	// Sidebar data
 	const topTickers = $derived(stats?.top_tickers ?? []);
 	const topExaggerators = $derived(stats?.most_exaggerated_users ?? []);
+
+	// Claim detail modal
+	let modalOpen = $state(false);
+	let selectedClaim: Claim | null = $state(null);
+
+	function openClaim(index: number) {
+		selectedClaim = displayClaims[index] ?? null;
+		if (selectedClaim) modalOpen = true;
+	}
 
 	let currentTime = $state(new Date().toISOString().replace('T', ' ').substring(0, 19));
 
@@ -429,7 +439,7 @@
 						<p class="font-mono text-sm text-holo animate-pulse">LOADING CLAIMS...</p>
 					</div>
 				{:else if claimRows.length > 0}
-					<DataGrid columns={claimColumns} rows={claimRows} />
+					<DataGrid columns={claimColumns} rows={claimRows} onRowClick={openClaim} />
 				{:else}
 					<p class="py-8 text-center font-mono text-sm text-text-dim">
 						No claims found{activeFilter ? ` with label "${activeFilter}"` : ''}{activeTicker
@@ -525,6 +535,61 @@
 		</div>
 	</div>
 </div>
+
+<!-- Claim Detail Modal -->
+<Modal bind:open={modalOpen} title="Claim Detail">
+	{#if selectedClaim}
+		<div class="space-y-4">
+			<!-- Header -->
+			<div class="flex items-center gap-3">
+				<Badge variant={labelVariant(selectedClaim.label)}>
+					{selectedClaim.label?.toUpperCase() ?? '?'}
+				</Badge>
+				<a href="/accounts/{selectedClaim.username}" class="font-mono text-sm text-holo hover:text-holo-bright transition-colors">
+					@{selectedClaim.username}
+				</a>
+				<a href="/intel/{selectedClaim.ticker}" class="font-mono text-xs text-text-dim hover:text-holo transition-colors">
+					{selectedClaim.ticker}
+				</a>
+			</div>
+
+			<!-- Full tweet text -->
+			<div class="border border-surface-border bg-surface/50 p-4">
+				<p class="font-mono text-xs leading-relaxed text-text-primary">
+					{selectedClaim.text}
+				</p>
+			</div>
+
+			<!-- Details grid -->
+			<div class="grid grid-cols-2 gap-3">
+				<div>
+					<div class="font-mono text-[10px] tracking-wider text-text-dim">DATE</div>
+					<div class="font-mono text-xs text-text-primary">
+						{selectedClaim.created_at ? new Date(selectedClaim.created_at).toLocaleString() : '—'}
+					</div>
+				</div>
+				<div>
+					<div class="font-mono text-[10px] tracking-wider text-text-dim">PRICE CHANGE</div>
+					<div class="font-mono text-xs {selectedClaim.price_change_pct != null && selectedClaim.price_change_pct >= 0 ? 'text-holo' : 'text-danger'}">
+						{selectedClaim.price_change_pct != null ? `${selectedClaim.price_change_pct >= 0 ? '+' : ''}${selectedClaim.price_change_pct.toFixed(2)}%` : '—'}
+					</div>
+				</div>
+				<div>
+					<div class="font-mono text-[10px] tracking-wider text-text-dim">DIRECTION</div>
+					<div class="font-mono text-xs text-text-primary">
+						{selectedClaim.claimed_direction ?? '?'} → {selectedClaim.actual_direction ?? '?'}
+					</div>
+				</div>
+				<div>
+					<div class="font-mono text-[10px] tracking-wider text-text-dim">CATALYST</div>
+					<div class="font-mono text-xs text-text-primary">
+						{selectedClaim.catalyst_type ?? (selectedClaim.has_catalyst ? 'Yes' : 'None')}
+					</div>
+				</div>
+			</div>
+		</div>
+	{/if}
+</Modal>
 
 <style>
 	.filter-btn {
