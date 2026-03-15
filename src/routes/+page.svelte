@@ -35,23 +35,23 @@
 	const topTickerCount = stats?.top_tickers?.length ?? 0;
 
 	const terminalLines = [
-		{ type: 'input' as const, text: 'sentinel --init --mode=defense-stock-analysis' },
-		{ type: 'success' as const, text: 'Claim analysis engine initialized' },
-		{ type: 'input' as const, text: 'scan --target=social-media --depth=full' },
+		{ type: 'input' as const, text: 'sentinel --init --mode=credibility-analysis' },
+		{ type: 'success' as const, text: 'Credibility scoring engine initialized' },
+		{ type: 'input' as const, text: 'scan --target=defense-stocks --source=social-media' },
 		{
 			type: 'output' as const,
-			text: `Tracking ${topTickerCount} defense tickers...`
+			text: `Monitoring ${topTickerCount} defense tickers across social media...`
 		},
 		{
 			type: 'success' as const,
-			text: `${totalClaims} claims analyzed. ${exaggerated} exaggerated, ${accurate} accurate, ${understated} understated.`
+			text: `${totalClaims} claims scored. ${exaggerated} exaggerated, ${accurate} accurate, ${understated} understated.`
 		},
-		{ type: 'input' as const, text: 'status --subsystem=all' },
+		{ type: 'input' as const, text: 'status --pipeline' },
 		{
 			type: 'output' as const,
-			text: `Scraper: ACTIVE | Labeler: ACTIVE | Accuracy: ${accuracyRate}%`
+			text: `Scraper: ACTIVE | Bot Filter: ACTIVE | Labeler: ACTIVE | Accuracy: ${accuracyRate}%`
 		},
-		{ type: 'success' as const, text: 'All subsystems nominal. Standing by.' }
+		{ type: 'success' as const, text: 'All pipelines nominal. Credibility monitoring active.' }
 	];
 
 	function startBoot() {
@@ -75,17 +75,17 @@
 	}
 
 	let statuses: LiveStatus[] = $state([
-		{ label: 'Primary Defense Grid', status: 'online', healing: false },
-		{ label: 'Threat Intelligence Feed', status: 'online', healing: false },
-		{ label: 'Sector 7-G Perimeter', status: 'online', healing: false },
-		{ label: 'Encryption Protocols', status: 'online', healing: false }
+		{ label: 'Twitter Scraper', status: 'online', healing: false },
+		{ label: 'Price Feed', status: 'online', healing: false },
+		{ label: 'Bot Classifier', status: 'online', healing: false },
+		{ label: 'Labeler Engine', status: 'online', healing: false }
 	]);
 
 	const warningMessages = [
-		'Sector 7-G Perimeter',
-		'Threat Intelligence Feed',
-		'Encryption Protocols',
-		'Primary Defense Grid'
+		'Twitter Scraper',
+		'Price Feed',
+		'Bot Classifier',
+		'Labeler Engine'
 	];
 
 	onMount(() => {
@@ -177,7 +177,7 @@
 				</GlitchText>
 			</h1>
 			<p class="mb-2 font-mono text-sm tracking-[0.2em] text-holo-dim/70 md:text-base">
-				ADVANCED DEFENSE PLATFORM
+				DEFENSE STOCK CREDIBILITY PLATFORM
 			</p>
 			<p class="mb-8 font-mono text-[10px] tracking-[0.25em] text-text-dim/50">
 				CLASSIFICATION: UNCLASSIFIED // FOUO
@@ -186,7 +186,7 @@
 			<!-- Typewriter -->
 			<div class="mb-10 h-7">
 				<TypewriterText
-					text="Systems dormant. Operator authentication required to initialize defense grid."
+					text="Systems dormant. Authorization required to initialize credibility monitoring."
 					speed={40}
 					delay={1000}
 					class="text-sm text-text-dim/70"
@@ -241,7 +241,7 @@
 				<div class="mb-10 flex items-center gap-4">
 					<div class="h-px flex-1 bg-surface-border"></div>
 					<h2 class="font-display text-xs tracking-[0.3em] text-text-dim">
-						OPERATIONS CENTER
+						CREDIBILITY OVERVIEW
 					</h2>
 					<div class="h-px flex-1 bg-surface-border"></div>
 				</div>
@@ -249,7 +249,7 @@
 				<div class="grid gap-6 lg:grid-cols-3">
 					<!-- Radar & Status -->
 					<div class="lg:col-span-1">
-						<HUDPanel title="Surveillance Radar" glow={true}>
+						<HUDPanel title="Pipeline Monitor" glow={true}>
 							<div class="flex flex-col items-center gap-4">
 								<RadarScan size={180} />
 								<div class="w-full space-y-3 pt-2">
@@ -268,7 +268,7 @@
 
 					<!-- Terminal -->
 					<div class="lg:col-span-2">
-						<HUDPanel title="Command Interface">
+						<HUDPanel title="System Log">
 							<CommandLine lines={terminalLines} />
 						</HUDPanel>
 					</div>

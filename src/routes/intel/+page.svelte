@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import {
 		HUDPanel,
 		DataGrid,
@@ -8,8 +7,7 @@
 		Input,
 		ThreatMeter,
 		AlertBanner,
-		ProgressBar,
-		StatusIndicator
+		ProgressBar
 	} from '$lib/components/ui';
 
 	let { data } = $props();
@@ -48,27 +46,34 @@
 	);
 
 	// Tweet predictor
-	let tweetText = $state('');
+	let tweetUrl = $state('');
 	let selectedModel = $state('');
 	let predicting = $state(false);
 
 	interface PredictResult {
 		label: string;
+		confidence?: number;
 		model: string;
 		available_models: string[];
+		account?: {
+			username: string;
+			grifter_score: number | null;
+			grifter_category: string;
+			total_claims: number;
+		};
 	}
 
 	let predictResult: PredictResult | null = $state(null);
 	let predictError: string | null = $state(null);
 
 	async function predictTweet() {
-		if (!tweetText.trim()) return;
+		if (!tweetUrl.trim()) return;
 		predicting = true;
 		predictResult = null;
 		predictError = null;
 
 		try {
-			const body: Record<string, string> = { text: tweetText };
+			const body: Record<string, string> = { url: tweetUrl.trim() };
 			if (selectedModel.trim()) body.model = selectedModel.trim();
 
 			const res = await fetch('/api/predict', {
@@ -91,55 +96,6 @@
 		}
 	}
 
-	// Self-healing feed statuses
-	interface FeedStatus {
-		label: string;
-		status: 'online' | 'warning' | 'critical';
-		healing: boolean;
-	}
-
-	let feeds: FeedStatus[] = $state([
-		{ label: 'Twitter Scraper', status: 'online', healing: false },
-		{ label: 'Price Feed', status: 'online', healing: false },
-		{ label: 'News Feed', status: 'online', healing: false },
-		{ label: 'Labeler Engine', status: 'online', healing: false },
-		{ label: 'Database', status: 'online', healing: false }
-	]);
-
-	onMount(() => {
-		function triggerFeedWarning() {
-			const onlineIndexes = feeds
-				.map((f, i) => (f.status === 'online' && !f.healing ? i : -1))
-				.filter((i) => i >= 0);
-			if (onlineIndexes.length === 0) return;
-
-			const idx = onlineIndexes[Math.floor(Math.random() * onlineIndexes.length)];
-			feeds[idx].status = 'warning';
-
-			setTimeout(() => {
-				feeds[idx].healing = true;
-				setTimeout(
-					() => {
-						feeds[idx].status = 'online';
-						feeds[idx].healing = false;
-					},
-					1000 + Math.random() * 1000
-				);
-			}, 2000 + Math.random() * 2000);
-		}
-
-		const interval = setInterval(
-			() => triggerFeedWarning(),
-			8000 + Math.random() * 7000
-		);
-		const firstTimeout = setTimeout(() => triggerFeedWarning(), 4000);
-
-		return () => {
-			clearInterval(interval);
-			clearTimeout(firstTimeout);
-		};
-	});
-
 	function labelBadgeVariant(label: string): 'danger' | 'success' | 'info' | 'default' {
 		if (label === 'exaggerated') return 'danger';
 		if (label === 'accurate') return 'success';
@@ -157,10 +113,10 @@
 	<div class="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 		<div>
 			<h1 class="font-display text-2xl tracking-wider text-text-bright">
-				INTELLIGENCE CENTER
+				DEFENSE STOCKS
 			</h1>
 			<p class="mt-1 font-mono text-xs text-text-dim">
-				Defense stock universe // Claim analysis // Ticker accuracy
+				Stock universe // Credibility metrics // Ticker accuracy
 			</p>
 		</div>
 		<div class="flex items-center gap-3">
@@ -207,17 +163,20 @@
 				</div>
 			</HUDPanel>
 
-			<!-- Feed Status -->
-			<HUDPanel title="Pipeline Status">
+			<!-- Top Tickers -->
+			<HUDPanel title="Most Active Tickers">
 				<div class="space-y-3">
-					{#each feeds as feed (feed.label)}
-						<div class="flex items-center gap-2">
-							<StatusIndicator status={feed.status} label={feed.label} size="sm" />
-							{#if feed.healing}
-								<span class="healing-badge">HEALING</span>
-							{/if}
+					{#each topTickers.slice(0, 8) as t (t.ticker)}
+						<div class="flex items-center justify-between">
+							<a href="/intel/{t.ticker}" class="font-mono text-xs text-holo hover:text-holo-bright transition-colors">
+								{t.ticker}
+							</a>
+							<span class="font-mono text-[10px] tabular-nums text-text-dim">{t.count} claims</span>
 						</div>
 					{/each}
+					{#if topTickers.length === 0}
+						<p class="font-mono text-xs text-text-dim">No data yet</p>
+					{/if}
 				</div>
 			</HUDPanel>
 		</div>
@@ -229,13 +188,12 @@
 		<HUDPanel title="Claim Predictor">
 			<div class="space-y-4">
 				<div>
-					<label class="mb-1 block font-mono text-[10px] tracking-wider text-text-dim">TWEET TEXT</label>
-					<textarea
-						bind:value={tweetText}
-						placeholder="Paste a tweet about a defense stock..."
-						class="analyze-textarea"
-						rows="3"
-					></textarea>
+					<label class="mb-1 block font-mono text-[10px] tracking-wider text-text-dim">TWEET URL</label>
+					<Input
+						bind:value={tweetUrl}
+						placeholder="https://x.com/user/status/123..."
+						label=""
+					/>
 				</div>
 				<div class="flex items-end gap-3">
 					<div class="flex-1">
@@ -244,10 +202,10 @@
 					<Button
 						variant="primary"
 						size="sm"
-						disabled={predicting || !tweetText.trim()}
+						disabled={predicting || !tweetUrl.trim()}
 						onclick={predictTweet}
 					>
-						{predicting ? 'PREDICTING...' : 'PREDICT'}
+						{predicting ? 'ANALYZING...' : 'ANALYZE'}
 					</Button>
 				</div>
 
@@ -263,10 +221,30 @@
 							<Badge variant={labelBadgeVariant(predictResult.label)}>
 								{predictResult.label.toUpperCase()}
 							</Badge>
+							{#if predictResult.confidence != null}
+								<span class="font-mono text-xs text-text-dim">
+									{(predictResult.confidence * 100).toFixed(1)}% confidence
+								</span>
+							{/if}
 							<span class="font-mono text-xs text-text-dim">
 								Model: {predictResult.model}
 							</span>
 						</div>
+						{#if predictResult.account}
+							<div class="flex items-center gap-2 border-t border-surface-border/50 pt-2">
+								<a href="/accounts/{predictResult.account.username}" class="font-mono text-xs text-holo hover:text-holo-bright transition-colors">
+									@{predictResult.account.username}
+								</a>
+								{#if predictResult.account.grifter_score != null}
+									<Badge variant={predictResult.account.grifter_score >= 0.8 ? 'danger' : predictResult.account.grifter_score >= 0.5 ? 'warning' : predictResult.account.grifter_score >= 0.2 ? 'info' : 'success'}>
+										{(predictResult.account.grifter_score * 100).toFixed(0)}% GRIFTER
+									</Badge>
+								{/if}
+								<span class="font-mono text-[10px] text-text-dim">
+									{predictResult.account.total_claims} prior claims
+								</span>
+							</div>
+						{/if}
 						{#if predictResult.available_models.length > 1}
 							<div>
 								<div class="font-mono text-[10px] text-text-dim mb-1">AVAILABLE MODELS</div>
@@ -311,47 +289,3 @@
 	</div>
 </div>
 
-<style>
-	.analyze-textarea {
-		width: 100%;
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 12px;
-		color: rgba(176, 196, 222, 0.9);
-		background: rgba(4, 10, 18, 0.8);
-		border: 1px solid rgba(26, 48, 80, 0.8);
-		padding: 10px 12px;
-		resize: vertical;
-		transition: border-color 0.2s ease;
-	}
-
-	.analyze-textarea:focus {
-		outline: none;
-		border-color: rgba(0, 212, 255, 0.5);
-		box-shadow: 0 0 8px rgba(0, 212, 255, 0.1);
-	}
-
-	.analyze-textarea::placeholder {
-		color: rgba(74, 96, 128, 0.6);
-	}
-
-	.healing-badge {
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 9px;
-		letter-spacing: 0.1em;
-		color: rgba(0, 212, 255, 0.9);
-		background: rgba(0, 212, 255, 0.1);
-		border: 1px solid rgba(0, 212, 255, 0.3);
-		padding: 1px 6px;
-		animation: healing-pulse 0.8s ease-in-out infinite;
-	}
-
-	@keyframes healing-pulse {
-		0%,
-		100% {
-			opacity: 1;
-		}
-		50% {
-			opacity: 0.4;
-		}
-	}
-</style>

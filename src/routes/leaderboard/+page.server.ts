@@ -1,0 +1,30 @@
+import type { PageServerLoad } from './$types';
+import { apiFetch } from '$lib/server/api';
+
+interface LeaderboardAccount {
+	username: string;
+	grifter_score: number;
+	total_claims: number;
+	exaggerated_count: number;
+	accurate_count: number;
+}
+
+interface LeaderboardResponse {
+	accounts: LeaderboardAccount[];
+	category: string;
+}
+
+export const load: PageServerLoad = async ({ fetch }) => {
+	try {
+		const [grifters, signal] = await Promise.all([
+			apiFetch<LeaderboardResponse>('/api/leaderboard?category=grifters&limit=20', fetch),
+			apiFetch<LeaderboardResponse>('/api/leaderboard?category=signal&limit=20', fetch)
+		]);
+		return {
+			grifters: grifters.accounts ?? grifters,
+			signal: signal.accounts ?? signal
+		};
+	} catch {
+		return { grifters: [], signal: [] };
+	}
+};

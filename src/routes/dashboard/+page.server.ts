@@ -47,7 +47,7 @@ interface Stats {
 export const load: PageServerLoad = async ({ fetch }) => {
 	try {
 		const [feed, stats] = await Promise.all([
-			apiFetch<Feed>('/api/feed?limit=20', fetch),
+			apiFetch<Feed>('/api/feed?limit=200', fetch),
 			apiFetch<Stats>('/api/stats', fetch)
 		]);
 		return { feed, stats };
