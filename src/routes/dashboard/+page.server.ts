@@ -46,10 +46,14 @@ interface Stats {
 
 export const load: PageServerLoad = async ({ fetch }) => {
 	try {
-		const [feed, stats] = await Promise.all([
-			apiFetch<Feed>('/api/feed?limit=200', fetch),
-			apiFetch<Stats>('/api/stats', fetch)
-		]);
+		const stats = await apiFetch<Stats>('/api/stats', fetch);
+		const totalClaims = stats.total_claims ?? 0;
+
+		// Fetch the newest page of claims (API returns oldest-first, so offset from end)
+		const pageSize = 50;
+		const offset = Math.max(0, totalClaims - pageSize);
+		const feed = await apiFetch<Feed>(`/api/feed?limit=${pageSize}&offset=${offset}`, fetch);
+
 		return { feed, stats };
 	} catch {
 		return { feed: { claims: [], count: 0 }, stats: null };

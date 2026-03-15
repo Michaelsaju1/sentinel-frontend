@@ -61,7 +61,7 @@
 	);
 
 	// Per-ticker breakdown
-	const tickerBreakdown = $derived(() => {
+	const tickerBreakdown = $derived.by(() => {
 		const map = new Map<string, { total: number; exaggerated: number; accurate: number }>();
 		for (const c of claims) {
 			if (!c.ticker) continue;
@@ -192,7 +192,7 @@
 			<!-- Top Tickers -->
 			<HUDPanel title="Most Discussed Tickers">
 				<div class="space-y-3">
-					{#each tickerBreakdown() as [ticker, stats] (ticker)}
+					{#each tickerBreakdown as [ticker, stats] (ticker)}
 						<div>
 							<div class="mb-1 flex items-center justify-between">
 								<a href="/intel/{ticker}" class="font-mono text-xs text-holo hover:text-holo-bright transition-colors">
@@ -208,7 +208,7 @@
 							/>
 						</div>
 					{/each}
-					{#if tickerBreakdown().length === 0}
+					{#if tickerBreakdown.length === 0}
 						<p class="font-mono text-xs text-text-dim">No ticker data</p>
 					{/if}
 				</div>
