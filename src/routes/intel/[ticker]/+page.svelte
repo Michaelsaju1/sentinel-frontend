@@ -6,8 +6,10 @@
 		StatsCard,
 		ProgressBar,
 		ThreatMeter,
-		RadarScan
+		RadarScan,
+		LabelerToggle
 	} from '$lib/components/ui';
+	import { page } from '$app/stores';
 
 	interface Claim {
 		tweet_id: number;
@@ -26,6 +28,7 @@
 	let { data } = $props();
 
 	const ticker = $derived(data.ticker);
+	const currentLabels = $derived($page.url.searchParams.get('labels') ?? 'naive');
 	const feed = $derived(data.feed);
 	const stats = $derived(data.stats);
 
@@ -81,9 +84,12 @@
 				Per-stock claim feed // Bot-filtered // Credibility scored
 			</p>
 		</div>
-		<a href="/intel" class="font-mono text-xs text-holo hover:text-holo-bright transition-colors">
-			&larr; ALL STOCKS
-		</a>
+		<div class="flex items-center gap-3">
+			<LabelerToggle />
+			<a href="/intel{currentLabels !== 'naive' ? '?labels=' + currentLabels : ''}" class="font-mono text-xs text-holo hover:text-holo-bright transition-colors">
+				&larr; ALL STOCKS
+			</a>
+		</div>
 	</div>
 
 	<!-- Stats Row -->

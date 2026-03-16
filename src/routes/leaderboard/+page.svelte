@@ -1,7 +1,8 @@
 <script lang="ts">
 	import {
 		HUDPanel,
-		Badge
+		Badge,
+		LabelerToggle
 	} from '$lib/components/ui';
 
 	let { data } = $props();
@@ -31,6 +32,7 @@
 			</p>
 		</div>
 		<div class="flex items-center gap-3">
+			<LabelerToggle />
 			<Badge variant="danger">{grifters.length} GRIFTERS</Badge>
 			<Badge variant="success">{signal.length} HIGH SIGNAL</Badge>
 		</div>

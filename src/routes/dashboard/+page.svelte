@@ -2,16 +2,20 @@
 	import {
 		HUDPanel,
 		ProgressBar,
-		DataGrid,
 		ThreatMeter,
 		RadarScan,
 		Badge,
 		Button,
 		CountUp,
-		StatsCard
+		StatsCard,
+		ClaimPopup,
+		LabelerToggle
 	} from '$lib/components/ui';
+	import { page } from '$app/stores';
 
 	let { data } = $props();
+
+	const currentLabels = $derived($page.url.searchParams.get('labels') ?? 'naive');
 
 	const stats = $derived(data.stats);
 	const totalClaims = $derived(stats?.total_claims ?? 0);
@@ -93,7 +97,7 @@
 			}
 
 			const labelParam = activeFilter ? `&label=${activeFilter}` : '';
-			const res = await fetch(`/api/feed/more?limit=${limit}&offset=${offset}${labelParam}`);
+			const res = await fetch(`/api/feed/more?limit=${limit}&offset=${offset}${labelParam}&labels=${currentLabels}`);
 			if (!res.ok) throw new Error(`${res.status}`);
 			const result = await res.json();
 			const claims: Claim[] = result.claims ?? [];
@@ -137,28 +141,6 @@
 		{ key: 'price_change', label: 'Price Chg', width: '90px' }
 	];
 
-	const claimRows = $derived(
-		displayClaims.map((c) => ({
-			time: c.created_at
-				? new Date(c.created_at).toLocaleString('en-US', {
-						month: 'short',
-						day: 'numeric',
-						hour: '2-digit',
-						minute: '2-digit'
-					})
-				: '—',
-			ticker: c.ticker ?? '—',
-			user: `@${c.username ?? '?'}`,
-			text: c.text ? (c.text.length > 60 ? c.text.substring(0, 60) + '...' : c.text) : '—',
-			label: c.label ? c.label.toUpperCase() : '—',
-			direction: `${c.claimed_direction ?? '?'} → ${c.actual_direction ?? '?'}`,
-			price_change:
-				c.price_change_pct != null
-					? `${c.price_change_pct >= 0 ? '+' : ''}${c.price_change_pct.toFixed(2)}%`
-					: '—'
-		}))
-	);
-
 	// Sidebar data
 	const topTickers = $derived(stats?.top_tickers ?? []);
 	const topExaggerators = $derived(stats?.most_exaggerated_users ?? []);
@@ -178,6 +160,15 @@
 		if (label === 'understated') return 'info';
 		return 'default';
 	}
+
+	// Claim popup state
+	let popupOpen = $state(false);
+	let selectedClaim: Claim | null = $state(null);
+
+	function openClaim(claim: Claim) {
+		selectedClaim = claim;
+		popupOpen = true;
+	}
 </script>
 
 <svelte:head>
@@ -194,6 +185,7 @@
 			</p>
 		</div>
 		<div class="flex items-center gap-3">
+			<LabelerToggle />
 			<Badge variant="default">{totalClaims.toLocaleString()} TOTAL CLAIMS</Badge>
 		</div>
 	</div>
@@ -292,8 +284,11 @@
 			<HUDPanel title="Recent Activity" glow={true}>
 				<div class="recent-feed h-80 space-y-2 overflow-y-auto">
 					{#each recentClaims as claim (claim.tweet_id)}
+						<!-- svelte-ignore a11y_click_events_have_key_events -->
+						<!-- svelte-ignore a11y_no_static_element_interactions -->
 						<div
-							class="claim-entry flex items-start gap-3 border-b border-surface-border/30 pb-2"
+							class="claim-entry flex items-start gap-3 border-b border-surface-border/30 pb-2 cursor-pointer hover:bg-holo-dark/20 transition-colors rounded px-1"
+							onclick={() => openClaim(claim)}
 						>
 							<div class="flex-shrink-0 pt-0.5">
 								<Badge variant={labelVariant(claim.label)}>
@@ -428,8 +423,55 @@
 					<div class="flex items-center justify-center py-12">
 						<p class="font-mono text-sm text-holo animate-pulse">LOADING CLAIMS...</p>
 					</div>
-				{:else if claimRows.length > 0}
-					<DataGrid columns={claimColumns} rows={claimRows} />
+				{:else if displayClaims.length > 0}
+					<div class="overflow-x-auto">
+						<table class="w-full border-collapse font-mono text-sm">
+							<thead>
+								<tr class="border-b border-holo-dim/50 bg-holo-dark/30">
+									{#each claimColumns as col (col.key)}
+										<th
+											class="px-4 py-2.5 text-left font-display text-[10px] font-semibold tracking-[0.2em] uppercase text-holo"
+											style={col.width ? `width: ${col.width}` : ''}
+										>
+											{col.label}
+										</th>
+									{/each}
+								</tr>
+							</thead>
+							<tbody>
+								{#each displayClaims as claim, i (claim.tweet_id ?? i)}
+									<tr
+										class="border-b border-surface-border transition-colors hover:bg-holo-dark/20 hover:shadow-[inset_0_0_20px_rgba(0,212,255,0.03)] cursor-pointer"
+										style="animation: fade-in-up 0.3s ease-out {Math.min(i, 10) * 50}ms both;"
+										onclick={() => openClaim(claim)}
+									>
+										<td class="px-4 py-2.5 text-text-primary">
+											{claim.created_at
+												? new Date(claim.created_at).toLocaleString('en-US', {
+														month: 'short',
+														day: 'numeric',
+														hour: '2-digit',
+														minute: '2-digit'
+													})
+												: '—'}
+										</td>
+										<td class="px-4 py-2.5 text-text-primary">{claim.ticker ?? '—'}</td>
+										<td class="px-4 py-2.5 text-text-primary">@{claim.username ?? '?'}</td>
+										<td class="px-4 py-2.5 text-text-primary">
+											{claim.text ? (claim.text.length > 60 ? claim.text.substring(0, 60) + '...' : claim.text) : '—'}
+										</td>
+										<td class="px-4 py-2.5 text-text-primary">{claim.label ? claim.label.toUpperCase() : '—'}</td>
+										<td class="px-4 py-2.5 text-text-primary">{claim.claimed_direction ?? '?'} → {claim.actual_direction ?? '?'}</td>
+										<td class="px-4 py-2.5 text-text-primary">
+											{claim.price_change_pct != null
+												? `${claim.price_change_pct >= 0 ? '+' : ''}${claim.price_change_pct.toFixed(2)}%`
+												: '—'}
+										</td>
+									</tr>
+								{/each}
+							</tbody>
+						</table>
+					</div>
 				{:else}
 					<p class="py-8 text-center font-mono text-sm text-text-dim">
 						No claims found{activeFilter ? ` with label "${activeFilter}"` : ''}{activeTicker
@@ -525,6 +567,8 @@
 		</div>
 	</div>
 </div>
+
+<ClaimPopup bind:open={popupOpen} claim={selectedClaim} />
 
 <style>
 	.filter-btn {

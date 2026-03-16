@@ -11,8 +11,9 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 	const limit = url.searchParams.get('limit') ?? '200';
 	const offset = url.searchParams.get('offset') ?? '0';
 	const label = url.searchParams.get('label');
+	const labels = url.searchParams.get('labels') ?? 'naive';
 
-	let query = `/api/feed?limit=${limit}&offset=${offset}`;
+	let query = `/api/feed?limit=${limit}&offset=${offset}&labels=${labels}`;
 	if (label) query += `&label=${label}`;
 
 	try {

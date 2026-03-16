@@ -20,3 +20,5 @@ export { default as ThreatMeter } from './ThreatMeter.svelte';
 export { default as NetworkGraph } from './NetworkGraph.svelte';
 export { default as CountUp } from './CountUp.svelte';
 export { default as BootSequence } from './BootSequence.svelte';
+export { default as ClaimPopup } from './ClaimPopup.svelte';
+export { default as LabelerToggle } from './LabelerToggle.svelte';

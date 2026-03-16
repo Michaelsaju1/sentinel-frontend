@@ -14,17 +14,20 @@ interface LeaderboardResponse {
 	category: string;
 }
 
-export const load: PageServerLoad = async ({ fetch }) => {
+export const load: PageServerLoad = async ({ fetch, url }) => {
+	const labels = url.searchParams.get('labels') ?? 'naive';
+
 	try {
 		const [grifters, signal] = await Promise.all([
-			apiFetch<LeaderboardResponse>('/api/leaderboard?category=grifters&limit=20', fetch),
-			apiFetch<LeaderboardResponse>('/api/leaderboard?category=signal&limit=20', fetch)
+			apiFetch<LeaderboardResponse>(`/api/leaderboard?category=grifters&limit=20&labels=${labels}`, fetch),
+			apiFetch<LeaderboardResponse>(`/api/leaderboard?category=signal&limit=20&labels=${labels}`, fetch)
 		]);
 		return {
 			grifters: grifters.accounts ?? grifters,
-			signal: signal.accounts ?? signal
+			signal: signal.accounts ?? signal,
+			labels
 		};
 	} catch {
-		return { grifters: [], signal: [] };
+		return { grifters: [], signal: [], labels };
 	}
 };

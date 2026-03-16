@@ -28,13 +28,15 @@ interface StockStats {
 	top_users: { username: string; count: number }[];
 }
 
-export const load: PageServerLoad = async ({ fetch, params }) => {
+export const load: PageServerLoad = async ({ fetch, params, url }) => {
+	const labels = url.searchParams.get('labels') ?? 'naive';
+
 	try {
 		const [feed, stats] = await Promise.all([
-			apiFetch<StockFeed>(`/api/stocks/${params.ticker}/feed?limit=50`, fetch),
-			apiFetch<StockStats>(`/api/stocks/${params.ticker}/stats`, fetch)
+			apiFetch<StockFeed>(`/api/stocks/${params.ticker}/feed?limit=50&labels=${labels}`, fetch),
+			apiFetch<StockStats>(`/api/stocks/${params.ticker}/stats?labels=${labels}`, fetch)
 		]);
-		return { feed, stats, ticker: params.ticker };
+		return { feed, stats, ticker: params.ticker, labels };
 	} catch {
 		error(404, `Ticker ${params.ticker} not found`);
 	}

@@ -14,13 +14,16 @@ interface Stats {
 		exaggerated: number;
 		understated: number;
 	}[];
+	labels: string;
 }
 
-export const load: PageServerLoad = async ({ fetch }) => {
+export const load: PageServerLoad = async ({ fetch, url }) => {
+	const labels = url.searchParams.get('labels') ?? 'naive';
+
 	try {
-		const stats = await apiFetch<Stats>('/api/stats', fetch);
-		return { stats };
+		const stats = await apiFetch<Stats>(`/api/stats?labels=${labels}`, fetch);
+		return { stats, labels };
 	} catch {
-		return { stats: null };
+		return { stats: null, labels };
 	}
 };

@@ -1,14 +1,18 @@
 <script lang="ts">
 	import {
 		HUDPanel,
-		DataGrid,
 		Badge,
-		ThreatMeter
+		ThreatMeter,
+		LabelerToggle
 	} from '$lib/components/ui';
+	import { page } from '$app/stores';
 
 	interface Account {
 		username: string;
 		is_bot: boolean;
+		account_type: string;
+		naive_grifter_score: number | null;
+		improved_grifter_score: number | null;
 		grifter_score: number | null;
 		total_claims: number;
 		exaggerated_count: number;
@@ -19,6 +23,13 @@
 	let { data } = $props();
 
 	const accounts: Account[] = $derived(data.accounts ?? []);
+	const currentLabels = $derived($page.url.searchParams.get('labels') ?? 'naive');
+
+	// Get the active grifter score based on selected labeler
+	function getScore(a: Account): number | null {
+		if (currentLabels === 'improved') return a.improved_grifter_score ?? a.grifter_score;
+		return a.naive_grifter_score ?? a.grifter_score;
+	}
 
 	function grifterCategory(score: number | null): { label: string; variant: 'danger' | 'warning' | 'info' | 'success' | 'default' } {
 		if (score === null) return { label: 'UNSCORED', variant: 'default' };
@@ -28,37 +39,81 @@
 		return { label: 'HIGH SIGNAL', variant: 'success' };
 	}
 
-	const columns = [
+	// Sorting state
+	type SortKey = 'username' | 'grifter_score' | 'total_claims' | 'exaggerated_count' | 'accurate_count' | 'last_seen';
+	let sortKey: SortKey = $state('grifter_score');
+	let sortAsc = $state(false);
+
+	function toggleSort(key: SortKey) {
+		if (sortKey === key) {
+			sortAsc = !sortAsc;
+		} else {
+			sortKey = key;
+			sortAsc = key === 'username';
+		}
+	}
+
+	const sortedAccounts = $derived.by(() => {
+		const sorted = [...accounts];
+		sorted.sort((a, b) => {
+			let aVal: string | number | null;
+			let bVal: string | number | null;
+
+			switch (sortKey) {
+				case 'username':
+					aVal = a.username.toLowerCase();
+					bVal = b.username.toLowerCase();
+					break;
+				case 'grifter_score':
+					aVal = getScore(a) ?? -1;
+					bVal = getScore(b) ?? -1;
+					break;
+				case 'total_claims':
+					aVal = a.total_claims;
+					bVal = b.total_claims;
+					break;
+				case 'exaggerated_count':
+					aVal = a.exaggerated_count;
+					bVal = b.exaggerated_count;
+					break;
+				case 'accurate_count':
+					aVal = a.accurate_count;
+					bVal = b.accurate_count;
+					break;
+				case 'last_seen':
+					aVal = a.last_seen ?? '';
+					bVal = b.last_seen ?? '';
+					break;
+				default:
+					return 0;
+			}
+
+			if (aVal < bVal) return sortAsc ? -1 : 1;
+			if (aVal > bVal) return sortAsc ? 1 : -1;
+			return 0;
+		});
+		return sorted;
+	});
+
+	const columns: { key: SortKey; label: string; width: string }[] = [
 		{ key: 'username', label: 'Account', width: '160px' },
-		{ key: 'score', label: 'Grifter Score', width: '120px' },
-		{ key: 'category', label: 'Category', width: '130px' },
-		{ key: 'total', label: 'Claims', width: '80px' },
-		{ key: 'exaggerated', label: 'Exaggerated', width: '100px' },
-		{ key: 'accurate', label: 'Accurate', width: '90px' },
+		{ key: 'grifter_score', label: 'Grifter Score', width: '120px' },
+		{ key: 'total_claims', label: 'Claims', width: '80px' },
+		{ key: 'exaggerated_count', label: 'Exaggerated', width: '100px' },
+		{ key: 'accurate_count', label: 'Accurate', width: '90px' },
 		{ key: 'last_seen', label: 'Last Active', width: '120px' }
 	];
 
-	const rows = $derived(
-		accounts.map((a) => {
-			const cat = grifterCategory(a.grifter_score);
-			return {
-				username: `@${a.username}`,
-				score: a.grifter_score != null ? `${(a.grifter_score * 100).toFixed(0)}%` : '—',
-				category: cat.label,
-				total: a.total_claims,
-				exaggerated: a.exaggerated_count,
-				accurate: a.accurate_count,
-				last_seen: a.last_seen
-					? new Date(a.last_seen).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-					: '—'
-			};
-		})
-	);
-
 	// Summary stats
 	const totalAccounts = $derived(accounts.length);
-	const grifterCount = $derived(accounts.filter((a) => a.grifter_score != null && a.grifter_score >= 0.8).length);
-	const signalCount = $derived(accounts.filter((a) => a.grifter_score != null && a.grifter_score < 0.2).length);
+	const grifterCount = $derived(accounts.filter((a) => {
+		const s = getScore(a);
+		return s != null && s >= 0.8;
+	}).length);
+	const signalCount = $derived(accounts.filter((a) => {
+		const s = getScore(a);
+		return s != null && s < 0.2;
+	}).length);
 </script>
 
 <svelte:head>
@@ -75,6 +130,7 @@
 			</p>
 		</div>
 		<div class="flex items-center gap-3">
+			<LabelerToggle />
 			<Badge variant="default">{totalAccounts} ACCOUNTS</Badge>
 			<Badge variant="danger">{grifterCount} GRIFTERS</Badge>
 			<Badge variant="success">{signalCount} HIGH SIGNAL</Badge>
@@ -108,6 +164,8 @@
 					<p class="font-mono text-[10px] leading-relaxed text-text-dim">
 						Grifter Score = exaggerated claims / total claims.
 						Only scored after 5+ labeled claims.
+						<br /><br />
+						Using <span class="text-holo">{currentLabels.toUpperCase()}</span> labeler.
 					</p>
 				</div>
 			</HUDPanel>
@@ -120,8 +178,53 @@
 		<!-- Account Table -->
 		<div class="lg:col-span-3">
 			<HUDPanel title="All Accounts">
-				{#if rows.length > 0}
-					<DataGrid {columns} {rows} />
+				{#if sortedAccounts.length > 0}
+					<div class="overflow-x-auto">
+						<table class="w-full border-collapse font-mono text-sm">
+							<thead>
+								<tr class="border-b border-holo-dim/50 bg-holo-dark/30">
+									{#each columns as col (col.key)}
+										<th
+											class="sort-header px-4 py-2.5 text-left font-display text-[10px] font-semibold tracking-[0.2em] uppercase text-holo cursor-pointer select-none hover:text-holo-bright transition-colors"
+											style="width: {col.width}"
+											onclick={() => toggleSort(col.key)}
+										>
+											{col.label}
+											{#if sortKey === col.key}
+												<span class="ml-1 text-holo-bright">{sortAsc ? '▲' : '▼'}</span>
+											{/if}
+										</th>
+									{/each}
+								</tr>
+							</thead>
+							<tbody>
+								{#each sortedAccounts as account, i (account.username)}
+									{@const score = getScore(account)}
+									<tr
+										class="border-b border-surface-border transition-colors hover:bg-holo-dark/20 hover:shadow-[inset_0_0_20px_rgba(0,212,255,0.03)]"
+										style="animation: fade-in-up 0.3s ease-out {Math.min(i, 10) * 50}ms both;"
+									>
+										<td class="px-4 py-2.5">
+											<a href="/accounts/{account.username}{currentLabels !== 'naive' ? '?labels=' + currentLabels : ''}" class="text-holo hover:text-holo-bright transition-colors">
+												@{account.username}
+											</a>
+										</td>
+										<td class="px-4 py-2.5 text-text-primary">
+											{score != null ? `${(score * 100).toFixed(0)}%` : '—'}
+										</td>
+										<td class="px-4 py-2.5 text-text-primary">{account.total_claims}</td>
+										<td class="px-4 py-2.5 text-text-primary">{account.exaggerated_count}</td>
+										<td class="px-4 py-2.5 text-text-primary">{account.accurate_count}</td>
+										<td class="px-4 py-2.5 text-text-primary">
+											{account.last_seen
+												? new Date(account.last_seen).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+												: '—'}
+										</td>
+									</tr>
+								{/each}
+							</tbody>
+						</table>
+					</div>
 				{:else}
 					<p class="py-8 text-center font-mono text-sm text-text-dim">
 						No account data available. The backend needs to classify accounts first.
@@ -131,3 +234,9 @@
 		</div>
 	</div>
 </div>
+
+<style>
+	.sort-header:hover {
+		background: rgba(0, 212, 255, 0.05);
+	}
+</style>

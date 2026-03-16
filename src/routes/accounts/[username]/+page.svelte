@@ -4,8 +4,10 @@
 		Badge,
 		DataGrid,
 		ProgressBar,
-		StatsCard
+		StatsCard,
+		LabelerToggle
 	} from '$lib/components/ui';
+	import { page } from '$app/stores';
 
 	let { data } = $props();
 
@@ -21,8 +23,13 @@
 
 	const account = $derived(data.account);
 	const claims: Claim[] = $derived(account?.claims ?? []);
+	const currentLabels = $derived($page.url.searchParams.get('labels') ?? 'naive');
 
-	const grifterScore = $derived(account?.grifter_score);
+	const grifterScore = $derived.by(() => {
+		if (!account) return null;
+		if (currentLabels === 'improved') return account.improved_grifter_score ?? account.grifter_score;
+		return account.naive_grifter_score ?? account.grifter_score;
+	});
 	const totalClaims = $derived(account?.total_claims ?? 0);
 	const exaggeratedCount = $derived(account?.exaggerated_count ?? 0);
 	const accurateCount = $derived(account?.accurate_count ?? 0);
@@ -104,9 +111,12 @@
 					{/if}
 				</p>
 			</div>
-			<a href="/accounts" class="font-mono text-xs text-holo hover:text-holo-bright transition-colors">
-				&larr; ALL ACCOUNTS
-			</a>
+			<div class="flex items-center gap-3">
+				<LabelerToggle />
+				<a href="/accounts{currentLabels !== 'naive' ? '?labels=' + currentLabels : ''}" class="font-mono text-xs text-holo hover:text-holo-bright transition-colors">
+					&larr; ALL ACCOUNTS
+				</a>
+			</div>
 		</div>
 	</div>
 
@@ -115,7 +125,7 @@
 		<StatsCard
 			label="Grifter Score"
 			value={grifterScore != null ? `${(grifterScore * 100).toFixed(0)}%` : '—'}
-			change={category.label}
+			change="{category.label} ({currentLabels})"
 			trend={grifterScore != null && grifterScore < 0.5 ? 'up' : 'down'}
 		/>
 		<StatsCard
@@ -195,7 +205,7 @@
 					{#each tickerBreakdown as [ticker, stats] (ticker)}
 						<div>
 							<div class="mb-1 flex items-center justify-between">
-								<a href="/intel/{ticker}" class="font-mono text-xs text-holo hover:text-holo-bright transition-colors">
+								<a href="/intel/{ticker}{currentLabels !== 'naive' ? '?labels=' + currentLabels : ''}" class="font-mono text-xs text-holo hover:text-holo-bright transition-colors">
 									{ticker}
 								</a>
 								<span class="font-mono text-[10px] text-text-dim">
