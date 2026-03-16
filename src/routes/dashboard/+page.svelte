@@ -145,6 +145,15 @@
 	const topTickers = $derived(stats?.top_tickers ?? []);
 	const topExaggerators = $derived(stats?.most_exaggerated_users ?? []);
 
+	// Claim detail modal
+	let modalOpen = $state(false);
+	let selectedClaim: Claim | null = $state(null);
+
+	function openClaim(index: number) {
+		selectedClaim = displayClaims[index] ?? null;
+		if (selectedClaim) modalOpen = true;
+	}
+
 	let currentTime = $state(new Date().toISOString().replace('T', ' ').substring(0, 19));
 
 	$effect(() => {

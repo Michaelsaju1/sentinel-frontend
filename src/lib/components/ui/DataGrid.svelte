@@ -2,10 +2,12 @@
 	let {
 		columns = [],
 		rows = [],
+		onRowClick,
 		class: className = ''
 	}: {
 		columns?: { key: string; label: string; width?: string }[];
 		rows?: Record<string, string | number>[];
+		onRowClick?: (index: number) => void;
 		class?: string;
 	} = $props();
 </script>
@@ -27,8 +29,9 @@
 		<tbody>
 			{#each rows as row, i (i)}
 				<tr
-					class="border-b border-surface-border transition-colors hover:bg-holo-dark/20 hover:shadow-[inset_0_0_20px_rgba(0,212,255,0.03)]"
+					class="border-b border-surface-border transition-colors hover:bg-holo-dark/20 hover:shadow-[inset_0_0_20px_rgba(0,212,255,0.03)] {onRowClick ? 'cursor-pointer' : ''}"
 					style="animation: fade-in-up 0.3s ease-out {i * 50}ms both;"
+					onclick={() => onRowClick?.(i)}
 				>
 					{#each columns as col (col.key)}
 						<td class="px-4 py-2.5 text-text-primary">
