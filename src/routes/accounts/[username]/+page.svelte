@@ -25,14 +25,16 @@
 	const claims: Claim[] = $derived(account?.claims ?? []);
 	const currentLabels = $derived($page.url.searchParams.get('labels') ?? 'naive');
 
-	const grifterScore = $derived.by(() => {
+	// Get the active labeler stats
+	const activeStats = $derived.by(() => {
 		if (!account) return null;
-		if (currentLabels === 'improved') return account.improved_grifter_score ?? account.grifter_score;
-		return account.naive_grifter_score ?? account.grifter_score;
+		return currentLabels === 'improved' ? account.improved : account.naive;
 	});
-	const totalClaims = $derived(account?.total_claims ?? 0);
-	const exaggeratedCount = $derived(account?.exaggerated_count ?? 0);
-	const accurateCount = $derived(account?.accurate_count ?? 0);
+
+	const grifterScore = $derived(activeStats?.grifter_score ?? null);
+	const totalClaims = $derived(activeStats?.total_claims ?? 0);
+	const exaggeratedCount = $derived(activeStats?.exaggerated_count ?? 0);
+	const accurateCount = $derived(activeStats?.accurate_count ?? 0);
 
 	function grifterCategory(score: number | null): { label: string; variant: 'danger' | 'warning' | 'info' | 'success' | 'default' } {
 		if (score === null) return { label: 'UNSCORED', variant: 'default' };

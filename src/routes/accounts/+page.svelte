@@ -7,17 +7,24 @@
 	} from '$lib/components/ui';
 	import { page } from '$app/stores';
 
-	interface Account {
-		username: string;
-		is_bot: boolean;
-		account_type: string;
-		naive_grifter_score: number | null;
-		improved_grifter_score: number | null;
-		grifter_score: number | null;
+	interface LabelerStats {
 		total_claims: number;
 		exaggerated_count: number;
 		accurate_count: number;
+		understated_count: number;
+		grifter_score: number | null;
+		grifter_category: string;
+	}
+
+	interface Account {
+		username: string;
+		is_bot: boolean;
+		bot_reason: string | null;
+		naive: LabelerStats;
+		improved: LabelerStats;
+		first_seen: string;
 		last_seen: string | null;
+		classified_at: string | null;
 	}
 
 	let { data } = $props();
@@ -25,10 +32,9 @@
 	const accounts: Account[] = $derived(data.accounts ?? []);
 	const currentLabels = $derived($page.url.searchParams.get('labels') ?? 'naive');
 
-	// Get the active grifter score based on selected labeler
-	function getScore(a: Account): number | null {
-		if (currentLabels === 'improved') return a.improved_grifter_score ?? a.grifter_score;
-		return a.naive_grifter_score ?? a.grifter_score;
+	// Get the active labeler stats for an account
+	function getStats(a: Account): LabelerStats {
+		return currentLabels === 'improved' ? a.improved : a.naive;
 	}
 
 	function grifterCategory(score: number | null): { label: string; variant: 'danger' | 'warning' | 'info' | 'success' | 'default' } {
@@ -59,26 +65,29 @@
 			let aVal: string | number | null;
 			let bVal: string | number | null;
 
+			const aStats = getStats(a);
+			const bStats = getStats(b);
+
 			switch (sortKey) {
 				case 'username':
 					aVal = a.username.toLowerCase();
 					bVal = b.username.toLowerCase();
 					break;
 				case 'grifter_score':
-					aVal = getScore(a) ?? -1;
-					bVal = getScore(b) ?? -1;
+					aVal = aStats.grifter_score ?? -1;
+					bVal = bStats.grifter_score ?? -1;
 					break;
 				case 'total_claims':
-					aVal = a.total_claims;
-					bVal = b.total_claims;
+					aVal = aStats.total_claims;
+					bVal = bStats.total_claims;
 					break;
 				case 'exaggerated_count':
-					aVal = a.exaggerated_count;
-					bVal = b.exaggerated_count;
+					aVal = aStats.exaggerated_count;
+					bVal = bStats.exaggerated_count;
 					break;
 				case 'accurate_count':
-					aVal = a.accurate_count;
-					bVal = b.accurate_count;
+					aVal = aStats.accurate_count;
+					bVal = bStats.accurate_count;
 					break;
 				case 'last_seen':
 					aVal = a.last_seen ?? '';
@@ -107,11 +116,11 @@
 	// Summary stats
 	const totalAccounts = $derived(accounts.length);
 	const grifterCount = $derived(accounts.filter((a) => {
-		const s = getScore(a);
+		const s = getStats(a).grifter_score;
 		return s != null && s >= 0.8;
 	}).length);
 	const signalCount = $derived(accounts.filter((a) => {
-		const s = getScore(a);
+		const s = getStats(a).grifter_score;
 		return s != null && s < 0.2;
 	}).length);
 </script>
@@ -199,7 +208,7 @@
 							</thead>
 							<tbody>
 								{#each sortedAccounts as account, i (account.username)}
-									{@const score = getScore(account)}
+									{@const stats = getStats(account)}
 									<tr
 										class="border-b border-surface-border transition-colors hover:bg-holo-dark/20 hover:shadow-[inset_0_0_20px_rgba(0,212,255,0.03)]"
 										style="animation: fade-in-up 0.3s ease-out {Math.min(i, 10) * 50}ms both;"
@@ -210,11 +219,11 @@
 											</a>
 										</td>
 										<td class="px-4 py-2.5 text-text-primary">
-											{score != null ? `${(score * 100).toFixed(0)}%` : '—'}
+											{stats.grifter_score != null ? `${(stats.grifter_score * 100).toFixed(0)}%` : '—'}
 										</td>
-										<td class="px-4 py-2.5 text-text-primary">{account.total_claims}</td>
-										<td class="px-4 py-2.5 text-text-primary">{account.exaggerated_count}</td>
-										<td class="px-4 py-2.5 text-text-primary">{account.accurate_count}</td>
+										<td class="px-4 py-2.5 text-text-primary">{stats.total_claims}</td>
+										<td class="px-4 py-2.5 text-text-primary">{stats.exaggerated_count}</td>
+										<td class="px-4 py-2.5 text-text-primary">{stats.accurate_count}</td>
 										<td class="px-4 py-2.5 text-text-primary">
 											{account.last_seen
 												? new Date(account.last_seen).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })

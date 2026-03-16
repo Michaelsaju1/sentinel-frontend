@@ -1,17 +1,26 @@
 import type { PageServerLoad } from './$types';
 import { apiFetch } from '$lib/server/api';
 
-interface LeaderboardAccount {
-	username: string;
-	grifter_score: number;
+interface LabelerStats {
 	total_claims: number;
 	exaggerated_count: number;
 	accurate_count: number;
+	understated_count: number;
+	grifter_score: number | null;
+	grifter_category: string;
+}
+
+interface LeaderboardAccount {
+	username: string;
+	is_bot: boolean;
+	naive: LabelerStats;
+	improved: LabelerStats;
 }
 
 interface LeaderboardResponse {
 	accounts: LeaderboardAccount[];
 	category: string;
+	labels: string;
 }
 
 export const load: PageServerLoad = async ({ fetch, url }) => {

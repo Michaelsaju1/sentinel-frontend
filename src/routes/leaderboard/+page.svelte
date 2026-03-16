@@ -4,14 +4,35 @@
 		Badge,
 		LabelerToggle
 	} from '$lib/components/ui';
+	import { page } from '$app/stores';
+
+	interface LabelerStats {
+		total_claims: number;
+		exaggerated_count: number;
+		accurate_count: number;
+		understated_count: number;
+		grifter_score: number | null;
+		grifter_category: string;
+	}
+
+	interface LeaderboardAccount {
+		username: string;
+		naive: LabelerStats;
+		improved: LabelerStats;
+	}
 
 	let { data } = $props();
 
-	const grifters = $derived(data.grifters ?? []);
-	const signal = $derived(data.signal ?? []);
+	const grifters: LeaderboardAccount[] = $derived(data.grifters ?? []);
+	const signal: LeaderboardAccount[] = $derived(data.signal ?? []);
+	const currentLabels = $derived($page.url.searchParams.get('labels') ?? 'naive');
 
-	function grifterCategory(score: number): { label: string; variant: 'danger' | 'warning' | 'info' | 'success' } {
-		if (score >= 0.8) return { label: 'GRIFTER', variant: 'danger' };
+	function getStats(account: LeaderboardAccount): LabelerStats {
+		return currentLabels === 'improved' ? account.improved : account.naive;
+	}
+
+	function grifterCategory(score: number | null): { label: string; variant: 'danger' | 'warning' | 'info' | 'success' } {
+		if (score === null || score >= 0.8) return { label: 'GRIFTER', variant: 'danger' };
 		if (score >= 0.5) return { label: 'MOSTLY WRONG', variant: 'warning' };
 		if (score >= 0.2) return { label: 'NORMAL', variant: 'info' };
 		return { label: 'HIGH SIGNAL', variant: 'success' };
@@ -43,12 +64,13 @@
 		<!-- Top Grifters -->
 		<HUDPanel title="Worst Track Records" variant="warning">
 			<p class="mb-4 font-mono text-[10px] tracking-wider text-text-dim">
-				Accounts that consistently exaggerate claims
+				Accounts that consistently exaggerate claims ({currentLabels} labeler)
 			</p>
 			{#if grifters.length > 0}
 				<div class="space-y-3">
 					{#each grifters as account, i (account.username)}
-						{@const cat = grifterCategory(account.grifter_score)}
+						{@const stats = getStats(account)}
+						{@const cat = grifterCategory(stats.grifter_score)}
 						<div
 							class="flex items-center gap-4 border border-surface-border bg-surface/50 px-4 py-3 transition-colors hover:border-warning/30"
 							style="animation: fade-in-up 0.3s ease-out {i * 50}ms both;"
@@ -57,19 +79,19 @@
 								{i + 1}
 							</span>
 							<div class="flex-1 min-w-0">
-								<a href="/accounts/{account.username}" class="font-mono text-sm text-holo hover:text-holo-bright transition-colors">
+								<a href="/accounts/{account.username}{currentLabels !== 'naive' ? '?labels=' + currentLabels : ''}" class="font-mono text-sm text-holo hover:text-holo-bright transition-colors">
 									@{account.username}
 								</a>
 								<div class="mt-1 flex items-center gap-2">
 									<Badge variant={cat.variant}>{cat.label}</Badge>
 									<span class="font-mono text-[10px] text-text-dim">
-										{account.total_claims} claims
+										{stats.total_claims} claims
 									</span>
 								</div>
 							</div>
 							<div class="text-right">
 								<div class="font-display text-lg text-warning">
-									{(account.grifter_score * 100).toFixed(0)}%
+									{stats.grifter_score != null ? (stats.grifter_score * 100).toFixed(0) : '—'}%
 								</div>
 								<div class="font-mono text-[9px] text-text-dim">GRIFTER</div>
 							</div>
@@ -86,12 +108,13 @@
 		<!-- High Signal -->
 		<HUDPanel title="Best Track Records" variant="info">
 			<p class="mb-4 font-mono text-[10px] tracking-wider text-text-dim">
-				Accounts with the most accurate predictions
+				Accounts with the most accurate predictions ({currentLabels} labeler)
 			</p>
 			{#if signal.length > 0}
 				<div class="space-y-3">
 					{#each signal as account, i (account.username)}
-						{@const cat = grifterCategory(account.grifter_score)}
+						{@const stats = getStats(account)}
+						{@const cat = grifterCategory(stats.grifter_score)}
 						<div
 							class="flex items-center gap-4 border border-surface-border bg-surface/50 px-4 py-3 transition-colors hover:border-holo/30"
 							style="animation: fade-in-up 0.3s ease-out {i * 50}ms both;"
@@ -100,19 +123,19 @@
 								{i + 1}
 							</span>
 							<div class="flex-1 min-w-0">
-								<a href="/accounts/{account.username}" class="font-mono text-sm text-holo hover:text-holo-bright transition-colors">
+								<a href="/accounts/{account.username}{currentLabels !== 'naive' ? '?labels=' + currentLabels : ''}" class="font-mono text-sm text-holo hover:text-holo-bright transition-colors">
 									@{account.username}
 								</a>
 								<div class="mt-1 flex items-center gap-2">
 									<Badge variant={cat.variant}>{cat.label}</Badge>
 									<span class="font-mono text-[10px] text-text-dim">
-										{account.total_claims} claims
+										{stats.total_claims} claims
 									</span>
 								</div>
 							</div>
 							<div class="text-right">
 								<div class="font-display text-lg text-holo">
-									{((1 - account.grifter_score) * 100).toFixed(0)}%
+									{stats.grifter_score != null ? ((1 - stats.grifter_score) * 100).toFixed(0) : '—'}%
 								</div>
 								<div class="font-mono text-[9px] text-text-dim">ACCURATE</div>
 							</div>
