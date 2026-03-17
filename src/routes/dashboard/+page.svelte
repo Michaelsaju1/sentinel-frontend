@@ -42,9 +42,8 @@
 	// === Server-side paginated table ===
 	const PAGE_SIZE = 50;
 
-	// The SSR data gives us the newest page of claims (fetched from end of dataset)
-	// API returns oldest-first, so reverse to show newest-first
-	const initialClaims = $derived([...(data.feed?.claims ?? [])].reverse() as Claim[]);
+	// API already returns newest-first
+	const initialClaims = $derived((data.feed?.claims ?? []) as Claim[]);
 
 	let tableClaims: Claim[] = $state([]);
 	let currentPage = $state(0);
@@ -84,26 +83,14 @@
 	async function fetchPage(page: number) {
 		loading = true;
 		try {
-			const total = totalCount;
-			// API returns oldest-first. To show newest-first, calculate offset from end.
-			// Page 0 = newest claims, Page 1 = next newest, etc.
-			const offsetFromEnd = (page + 1) * PAGE_SIZE;
-			const offset = Math.max(0, total - offsetFromEnd);
-			const limit = Math.min(PAGE_SIZE, total - page * PAGE_SIZE);
-
-			if (limit <= 0) {
-				tableClaims = [];
-				return;
-			}
+			// API returns newest-first, so page 0 = offset 0, page 1 = offset 50, etc.
+			const offset = page * PAGE_SIZE;
 
 			const labelParam = activeFilter ? `&label=${activeFilter}` : '';
-			const res = await fetch(`/api/feed/more?limit=${limit}&offset=${offset}${labelParam}&labels=${currentLabels}`);
+			const res = await fetch(`/api/feed/more?limit=${PAGE_SIZE}&offset=${offset}${labelParam}&labels=${currentLabels}`);
 			if (!res.ok) throw new Error(`${res.status}`);
 			const result = await res.json();
-			const claims: Claim[] = result.claims ?? [];
-
-			// Reverse to show newest-first
-			tableClaims = [...claims].reverse();
+			tableClaims = (result.claims ?? []) as Claim[];
 		} catch (e) {
 			console.error('Failed to fetch claims:', e);
 		} finally {

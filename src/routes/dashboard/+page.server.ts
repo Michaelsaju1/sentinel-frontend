@@ -52,10 +52,9 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
 		const stats = await apiFetch<Stats>(`/api/stats?labels=${labels}`, fetch);
 		const totalClaims = stats.total_claims ?? 0;
 
-		// Fetch the newest page of claims (API returns oldest-first, so offset from end)
+		// API returns newest-first, so offset=0 gives us the newest claims
 		const pageSize = 50;
-		const offset = Math.max(0, totalClaims - pageSize);
-		const feed = await apiFetch<Feed>(`/api/feed?limit=${pageSize}&offset=${offset}&labels=${labels}`, fetch);
+		const feed = await apiFetch<Feed>(`/api/feed?limit=${pageSize}&offset=0&labels=${labels}`, fetch);
 
 		return { feed, stats, labels };
 	} catch {

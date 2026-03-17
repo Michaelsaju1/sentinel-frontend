@@ -123,6 +123,16 @@
 		const s = getStats(a).grifter_score;
 		return s != null && s < 0.2;
 	}).length);
+
+	// Average grifter score across scored accounts, scaled to 0–5
+	const avgGrifterLevel = $derived.by(() => {
+		const scored = accounts
+			.map((a) => getStats(a).grifter_score)
+			.filter((s): s is number => s != null);
+		if (scored.length === 0) return 0;
+		const avg = scored.reduce((sum, s) => sum + s, 0) / scored.length;
+		return Math.min(5, Math.round(avg * 5));
+	});
 </script>
 
 <svelte:head>
@@ -180,7 +190,7 @@
 			</HUDPanel>
 
 			<HUDPanel title="Grifter Index" variant="warning">
-				<ThreatMeter level={totalAccounts > 0 ? Math.min(Math.round((grifterCount / totalAccounts) * 5), 5) : 0} label="Grifter Density" />
+				<ThreatMeter level={avgGrifterLevel} label="Grifter Density" />
 			</HUDPanel>
 		</div>
 

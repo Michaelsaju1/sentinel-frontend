@@ -23,25 +23,39 @@
 	const accuracyRate = $derived(totalClaims > 0 ? ((accurate / totalClaims) * 100).toFixed(1) : '0');
 	const topTickerCount = $derived(stats?.top_tickers?.length ?? 0);
 
+	const topTickers = $derived(stats?.top_tickers ?? []);
+	const topExaggerators = $derived(stats?.most_exaggerated_users ?? []);
+
 	const terminalLines = $derived([
 		{ type: 'input' as const, text: 'sentinel --init --mode=credibility-analysis' },
-		{ type: 'success' as const, text: 'Credibility scoring engine initialized' },
-		{ type: 'input' as const, text: 'scan --target=defense-stocks --source=social-media' },
+		{ type: 'success' as const, text: 'Credibility scoring engine online.' },
+		{ type: 'input' as const, text: 'scan --target=defense-stocks --source=twitter' },
 		{
 			type: 'output' as const,
-			text: `Monitoring ${topTickerCount} defense tickers across social media...`
+			text: `Tracking ${topTickerCount} defense tickers across social media...`
 		},
 		{
 			type: 'success' as const,
-			text: `${totalClaims} claims scored. ${exaggerated} exaggerated, ${accurate} accurate, ${understated} understated.`
+			text: `${totalClaims.toLocaleString()} claims labeled. ${exaggerated.toLocaleString()} exaggerated, ${accurate.toLocaleString()} accurate, ${understated.toLocaleString()} understated.`
 		},
-		{ type: 'input' as const, text: 'status --pipeline' },
+		{ type: 'input' as const, text: 'status' },
 		{
 			type: 'output' as const,
-			text: `Scraper: ACTIVE | Bot Filter: ACTIVE | Labeler: ACTIVE | Accuracy: ${accuracyRate}%`
+			text: `Scraper: ACTIVE | Labeler: ACTIVE | Bot Filter: ACTIVE | Accuracy: ${accuracyRate}%`
 		},
-		{ type: 'success' as const, text: 'All pipelines nominal. Credibility monitoring active.' }
+		{ type: 'success' as const, text: 'All pipelines nominal.' }
 	]);
+
+	const terminalStats = $derived({
+		totalClaims,
+		exaggerated,
+		accurate,
+		understated,
+		accuracyRate,
+		topTickerCount,
+		topTickers,
+		topExaggerators
+	});
 
 	// ===== Self-healing status system =====
 	interface LiveStatus {
@@ -167,7 +181,7 @@
 					<!-- Terminal -->
 					<div class="lg:col-span-2">
 						<HUDPanel title="System Log">
-							<CommandLine lines={terminalLines} />
+							<CommandLine lines={terminalLines} stats={terminalStats} />
 						</HUDPanel>
 					</div>
 				</div>

@@ -239,12 +239,12 @@
 							<optgroup label="Naive Labeler">
 								<option value="baseline/naive_labeler">Baseline / Naive</option>
 								<option value="classical/naive_labeler">Classical / Naive</option>
-								<option value="neural/naive_labeler">Neural / Naive</option>
+								<option value="neural/naive_labeler" disabled>Neural / Naive — BERTweet needs a GPU, not a $5 VPS</option>
 							</optgroup>
 							<optgroup label="Improved Labeler">
 								<option value="baseline/improved_labeler">Baseline / Improved</option>
 								<option value="classical/improved_labeler">Classical / Improved</option>
-								<option value="neural/improved_labeler">Neural / Improved</option>
+								<option value="neural/improved_labeler" disabled>Neural / Improved — BERTweet needs a GPU, not a $5 VPS</option>
 							</optgroup>
 						</select>
 					</div>
@@ -337,7 +337,7 @@
 				{#each accuracyByTicker.slice(0, 8) as t (t.ticker)}
 					<div>
 						<div class="mb-1 flex items-center justify-between">
-							<span class="font-mono text-xs text-text-primary">{t.ticker}</span>
+							<a href="/intel/{t.ticker}{currentLabels !== 'naive' ? '?labels=' + currentLabels : ''}" class="font-mono text-xs text-holo hover:text-holo-bright transition-colors">{t.ticker}</a>
 							<span class="font-mono text-[10px] text-text-dim">
 								{t.accurate}/{t.total} accurate
 							</span>

@@ -27,35 +27,35 @@
 	let mounted = $state(false);
 
 	const bootLines = [
-		'[BOOT] Loading kernel modules',
-		'[BOOT] Initializing neural network',
-		'[BOOT] Calibrating threat sensors',
-		'[BOOT] Establishing secure channels',
-		'[BOOT] Loading defense protocols',
-		'[BOOT] Syncing intelligence database'
+		'[BOOT] Connecting to Twitter/X firehose',
+		'[BOOT] Loading defense stock universe',
+		'[BOOT] Initializing credibility labeler',
+		'[BOOT] Calibrating grifter detection',
+		'[BOOT] Starting price feed ingestion',
+		'[BOOT] Syncing claim database'
 	];
 
 	const subsystems = [
-		'FIREWALL_CORE',
-		'NEURAL_ENGINE',
-		'THREAT_MATRIX',
-		'CRYPTO_MODULE',
-		'PACKET_INSPECTOR',
-		'ANOMALY_DETECTOR',
-		'IDS_SUBSYSTEM',
-		'ENCRYPTION_AES256',
-		'NETWORK_MONITOR',
-		'RESPONSE_ENGINE',
-		'LOG_AGGREGATOR',
-		'DNS_RESOLVER',
-		'AUTH_PROTOCOL',
-		'CERT_VALIDATOR',
-		'HEURISTIC_SCANNER',
-		'PAYLOAD_ANALYZER',
-		'TRAFFIC_SHAPER',
-		'VPN_TUNNEL',
-		'SANDBOX_ENV',
-		'DEEP_INSPECT'
+		'TWEET_SCRAPER',
+		'PRICE_FEED',
+		'NAIVE_LABELER',
+		'IMPROVED_LABELER',
+		'BOT_CLASSIFIER',
+		'GRIFTER_SCORER',
+		'CLAIM_PIPELINE',
+		'TICKER_RESOLVER',
+		'CATALYST_DETECTOR',
+		'DIRECTION_ANALYZER',
+		'EXAGGERATION_SCORER',
+		'NEWS_CORRELATOR',
+		'ACCOUNT_PROFILER',
+		'SENTIMENT_ENGINE',
+		'CREDIBILITY_INDEX',
+		'STOCK_UNIVERSE',
+		'FEED_AGGREGATOR',
+		'LABEL_DISTRIBUTOR',
+		'ACCURACY_TRACKER',
+		'ALERT_DISPATCHER'
 	];
 
 	onMount(() => {
@@ -223,7 +223,7 @@
 				<!-- Phase 3: Progress bar -->
 				{#if phase >= 3 && phase < 4}
 					<div class="boot-progress-section">
-						<div class="boot-progress-label">CORE SYSTEMS LOADING</div>
+						<div class="boot-progress-label">LOADING CREDIBILITY PIPELINE</div>
 						<div class="boot-progress-container">
 							<div class="boot-progress-bar" style="width: {progressPercent}%"></div>
 						</div>
@@ -270,7 +270,7 @@
 
 			<!-- All systems online -->
 			{#if allSystemsOnline}
-				<div class="hud-status-text">ALL SYSTEMS ONLINE</div>
+				<div class="hud-status-text">CREDIBILITY MONITORING ACTIVE</div>
 			{/if}
 		{/if}
 
@@ -286,14 +286,14 @@
 		<!-- Ambient corner data -->
 		{#if phase >= 2 && phase < 5}
 			<div class="boot-ambient-tl">
-				<div class="ambient-text">SYS.KERNEL v3.1.7</div>
-				<div class="ambient-text">MEM: 128GB DDR5</div>
-				<div class="ambient-text">NET: 10Gbps ACTIVE</div>
+				<div class="ambient-text">RUNTIME: SVELTEKIT + BUN</div>
+				<div class="ambient-text">BACKEND: FLASK + POSTGRES</div>
+				<div class="ambient-text">HOST: HETZNER VPS</div>
 			</div>
 			<div class="boot-ambient-br">
-				<div class="ambient-text">SENTINEL DEFENSE SYS</div>
-				<div class="ambient-text">BUILD 2026.03.02</div>
-				<div class="ambient-text">CLEARANCE: TS/SCI</div>
+				<div class="ambient-text">SENTINEL v2.1.0</div>
+				<div class="ambient-text">BUILD 2026.03.17</div>
+				<div class="ambient-text">MODE: CREDIBILITY ANALYSIS</div>
 			</div>
 		{/if}
 	</div>

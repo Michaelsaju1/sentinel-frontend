@@ -5,7 +5,8 @@
 		DataGrid,
 		ProgressBar,
 		StatsCard,
-		LabelerToggle
+		LabelerToggle,
+		ClaimPopup
 	} from '$lib/components/ui';
 	import { page } from '$app/stores';
 
@@ -70,6 +71,17 @@
 	);
 
 	// Per-ticker breakdown
+	// Claim popup state
+	let popupOpen = $state(false);
+	let selectedClaim: (Claim & { username?: string }) | null = $state(null);
+
+	function openClaim(index: number) {
+		const claim = claims[index];
+		if (!claim) return;
+		selectedClaim = { ...claim, username: account?.username };
+		popupOpen = true;
+	}
+
 	const tickerBreakdown = $derived.by(() => {
 		const map = new Map<string, { total: number; exaggerated: number; accurate: number }>();
 		for (const c of claims) {
@@ -156,7 +168,7 @@
 		<div class="lg:col-span-2">
 			<HUDPanel title="Claim History">
 				{#if claimRows.length > 0}
-					<DataGrid columns={claimColumns} rows={claimRows} />
+					<DataGrid columns={claimColumns} rows={claimRows} onRowClick={openClaim} />
 				{:else}
 					<p class="py-8 text-center font-mono text-sm text-text-dim">
 						No claims recorded for this account.
@@ -228,3 +240,5 @@
 		</div>
 	</div>
 </div>
+
+<ClaimPopup bind:open={popupOpen} claim={selectedClaim} />
