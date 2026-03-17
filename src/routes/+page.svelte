@@ -151,14 +151,6 @@
 		<!-- Operations Center -->
 		<section class="py-16">
 			<div class="mx-auto max-w-7xl px-4 lg:px-8">
-				<div class="mb-10 flex items-center gap-4">
-					<div class="h-px flex-1 bg-surface-border"></div>
-					<h2 class="font-display text-xs tracking-[0.3em] text-text-dim">
-						CREDIBILITY OVERVIEW
-					</h2>
-					<div class="h-px flex-1 bg-surface-border"></div>
-				</div>
-
 				<div class="grid gap-6 lg:grid-cols-3">
 					<!-- Radar & Status -->
 					<div class="lg:col-span-1">
