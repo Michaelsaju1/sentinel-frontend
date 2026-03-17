@@ -1,3 +1,4 @@
+// This file was developed with the assistance of Claude Code and Opus 4.6.
 import { env } from '$env/dynamic/private';
 
 function getApiBase(): string {

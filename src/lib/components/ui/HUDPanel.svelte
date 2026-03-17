@@ -1,4 +1,5 @@
 <script lang="ts">
+	// This file was developed with the assistance of Claude Code and Opus 4.6.
 	import type { Snippet } from 'svelte';
 
 	let {
@@ -31,7 +32,7 @@
 </script>
 
 <div
-	class="relative border {borderColors[variant]} bg-surface-light/60 backdrop-blur-sm {glow
+	class="relative flex flex-col border {borderColors[variant]} bg-surface-light/60 backdrop-blur-sm {glow
 		? 'border-glow'
 		: ''} {className}"
 >
@@ -47,7 +48,7 @@
 		</div>
 	{/if}
 
-	<div class="p-4">
+	<div class="flex-1 p-4">
 		{@render children()}
 	</div>
 </div>

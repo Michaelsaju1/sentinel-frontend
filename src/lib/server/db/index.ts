@@ -1,3 +1,4 @@
+// This file was developed with the assistance of Claude Code and Opus 4.6.
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as schema from './schema';

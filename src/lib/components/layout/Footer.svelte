@@ -1,4 +1,5 @@
 <script lang="ts">
+	// This file was developed with the assistance of Claude Code and Opus 4.6.
 	let year = new Date().getFullYear();
 </script>
 
@@ -27,7 +28,7 @@
 					Navigation
 				</h4>
 				<div class="flex flex-col gap-1.5">
-					{#each [{ href: '/', label: 'Home' }, { href: '/dashboard', label: 'Feed' }, { href: '/intel', label: 'Stocks' }, { href: '/accounts', label: 'Accounts' }, { href: '/leaderboard', label: 'Leaderboard' }] as link (link.href)}
+					{#each [{ href: '/', label: 'Home' }, { href: '/dashboard', label: 'Feed' }, { href: '/stocks', label: 'Stocks' }, { href: '/accounts', label: 'Accounts' }, { href: '/leaderboard', label: 'Leaderboard' }] as link (link.href)}
 						<a
 							href={link.href}
 							class="font-mono text-xs text-text-dim transition-colors hover:text-holo"

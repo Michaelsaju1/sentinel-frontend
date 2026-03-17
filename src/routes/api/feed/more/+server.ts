@@ -1,3 +1,4 @@
+// This file was developed with the assistance of Claude Code and Opus 4.6.
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 import { apiFetch } from '$lib/server/api';

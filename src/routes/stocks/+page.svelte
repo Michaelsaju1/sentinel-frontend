@@ -1,4 +1,5 @@
 <script lang="ts">
+	// This file was developed with the assistance of Claude Code and Opus 4.6.
 	import {
 		HUDPanel,
 		Badge,
@@ -120,7 +121,7 @@
 </script>
 
 <svelte:head>
-	<title>SENTINEL // Intel</title>
+	<title>SENTINEL // Stocks</title>
 </svelte:head>
 
 <div class="mx-auto max-w-7xl px-4 py-8 lg:px-8">
@@ -166,10 +167,10 @@
 									<tr
 										class="border-b border-surface-border transition-colors hover:bg-holo-dark/20 hover:shadow-[inset_0_0_20px_rgba(0,212,255,0.03)] cursor-pointer"
 										style="animation: fade-in-up 0.3s ease-out {i * 50}ms both;"
-										onclick={() => window.location.href = `/intel/${row.ticker}${currentLabels !== 'naive' ? '?labels=' + currentLabels : ''}`}
+										onclick={() => window.location.href = `/stocks/${row.ticker}${currentLabels !== 'naive' ? '?labels=' + currentLabels : ''}`}
 									>
 										<td class="px-4 py-2.5">
-											<a href="/intel/{row.ticker}{currentLabels !== 'naive' ? '?labels=' + currentLabels : ''}" class="text-holo hover:text-holo-bright transition-colors">
+											<a href="/stocks/{row.ticker}{currentLabels !== 'naive' ? '?labels=' + currentLabels : ''}" class="text-holo hover:text-holo-bright transition-colors">
 												{row.ticker}
 											</a>
 										</td>
@@ -337,7 +338,7 @@
 				{#each accuracyByTicker.slice(0, 8) as t (t.ticker)}
 					<div>
 						<div class="mb-1 flex items-center justify-between">
-							<a href="/intel/{t.ticker}{currentLabels !== 'naive' ? '?labels=' + currentLabels : ''}" class="font-mono text-xs text-holo hover:text-holo-bright transition-colors">{t.ticker}</a>
+							<a href="/stocks/{t.ticker}{currentLabels !== 'naive' ? '?labels=' + currentLabels : ''}" class="font-mono text-xs text-holo hover:text-holo-bright transition-colors">{t.ticker}</a>
 							<span class="font-mono text-[10px] text-text-dim">
 								{t.accurate}/{t.total} accurate
 							</span>

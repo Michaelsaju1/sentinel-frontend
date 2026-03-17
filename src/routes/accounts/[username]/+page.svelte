@@ -1,4 +1,5 @@
 <script lang="ts">
+	// This file was developed with the assistance of Claude Code and Opus 4.6.
 	import {
 		HUDPanel,
 		Badge,
@@ -219,7 +220,7 @@
 					{#each tickerBreakdown as [ticker, stats] (ticker)}
 						<div>
 							<div class="mb-1 flex items-center justify-between">
-								<a href="/intel/{ticker}{currentLabels !== 'naive' ? '?labels=' + currentLabels : ''}" class="font-mono text-xs text-holo hover:text-holo-bright transition-colors">
+								<a href="/stocks/{ticker}{currentLabels !== 'naive' ? '?labels=' + currentLabels : ''}" class="font-mono text-xs text-holo hover:text-holo-bright transition-colors">
 									{ticker}
 								</a>
 								<span class="font-mono text-[10px] text-text-dim">

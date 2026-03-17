@@ -1,3 +1,4 @@
+// This file was developed with the assistance of Claude Code and Opus 4.6.
 import type { RequestHandler } from '@sveltejs/kit';
 import { getApiUrl } from '$lib/server/api';
 

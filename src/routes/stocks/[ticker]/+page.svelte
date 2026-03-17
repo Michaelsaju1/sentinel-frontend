@@ -1,4 +1,5 @@
 <script lang="ts">
+	// This file was developed with the assistance of Claude Code and Opus 4.6.
 	import {
 		HUDPanel,
 		DataGrid,
@@ -86,7 +87,7 @@
 		</div>
 		<div class="flex items-center gap-3">
 			<LabelerToggle />
-			<a href="/intel{currentLabels !== 'naive' ? '?labels=' + currentLabels : ''}" class="font-mono text-xs text-holo hover:text-holo-bright transition-colors">
+			<a href="/stocks{currentLabels !== 'naive' ? '?labels=' + currentLabels : ''}" class="font-mono text-xs text-holo hover:text-holo-bright transition-colors">
 				&larr; ALL STOCKS
 			</a>
 		</div>

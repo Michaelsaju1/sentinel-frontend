@@ -1,4 +1,5 @@
 <script lang="ts">
+	// This file was developed with the assistance of Claude Code and Opus 4.6.
 	import Modal from './Modal.svelte';
 	import Badge from './Badge.svelte';
 
@@ -46,7 +47,7 @@
 				</a>
 				{#if claim.ticker}
 					<a
-						href="/intel/{claim.ticker}"
+						href="/stocks/{claim.ticker}"
 						class="font-mono text-xs text-holo-accent hover:text-holo-bright transition-colors"
 					>
 						${claim.ticker}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	// This file was developed with the assistance of Claude Code and Opus 4.6.
 	import { goto } from '$app/navigation';
 	import { tick } from 'svelte';
 
@@ -73,7 +74,7 @@
 					{ type: 'output', text: '' },
 					{ type: 'output', text: '  Navigation:' },
 					{ type: 'output', text: '  feed            Go to claim feed' },
-					{ type: 'output', text: '  intel           Go to defense stocks' },
+					{ type: 'output', text: '  stocks          Go to defense stocks' },
 					{ type: 'output', text: '  accounts        Go to account credibility' }
 				);
 				break;
@@ -118,9 +119,9 @@
 					const ticker = arg.toUpperCase();
 					addLines(
 						{ type: 'output', text: `Scanning ${ticker}...` },
-						{ type: 'success', text: `Navigating to /intel/${ticker}` }
+						{ type: 'success', text: `Navigating to /stocks/${ticker}` }
 					);
-					setTimeout(() => goto(`/intel/${ticker}`), 600);
+					setTimeout(() => goto(`/stocks/${ticker}`), 600);
 				}
 				break;
 			}
@@ -203,9 +204,10 @@
 				setTimeout(() => goto('/dashboard'), 400);
 				break;
 
+			case 'stocks':
 			case 'intel':
 				addLines({ type: 'success', text: 'Navigating to defense stocks...' });
-				setTimeout(() => goto('/intel'), 400);
+				setTimeout(() => goto('/stocks'), 400);
 				break;
 
 			case 'accounts':
@@ -296,7 +298,7 @@
 </script>
 
 <div
-	class="overflow-hidden border border-surface-border bg-surface font-mono text-sm {className}"
+	class="flex flex-col overflow-hidden border border-surface-border bg-surface font-mono text-sm {className}"
 >
 	<!-- Title bar -->
 	<div class="flex items-center gap-2 border-b border-surface-border bg-surface-light px-3 py-1.5">
@@ -309,12 +311,12 @@
 		<span class="ml-auto text-[9px] tracking-wider text-text-dim/40">type "help" for commands</span>
 	</div>
 
-	<!-- Terminal content -->
+	<!-- Terminal history -->
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
 		bind:this={scrollContainer}
-		class="terminal-scroll max-h-72 space-y-0.5 overflow-y-auto p-3"
+		class="terminal-scroll min-h-0 flex-1 space-y-0.5 overflow-y-auto px-3 pt-3"
 		onclick={() => document.getElementById('terminal-input')?.focus()}
 	>
 		{#each history as line, i (i)}
@@ -333,20 +335,25 @@
 				{/if}
 			</div>
 		{/each}
+	</div>
 
-		<!-- Input line -->
-		<div class="flex items-center gap-2">
-			<span class="flex-shrink-0 text-holo-dim">{prompt}</span>
-			<input
-				id="terminal-input"
-				type="text"
-				bind:value={inputValue}
-				onkeydown={handleKeydown}
-				class="flex-1 bg-transparent text-text-primary caret-holo outline-none"
-				spellcheck="false"
-				autocomplete="off"
-			/>
-		</div>
+	<!-- Input line (pinned to bottom) -->
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<div
+		class="flex items-center gap-2 border-t border-surface-border/30 px-3 py-2"
+		onclick={() => document.getElementById('terminal-input')?.focus()}
+	>
+		<span class="flex-shrink-0 text-holo-dim">{prompt}</span>
+		<input
+			id="terminal-input"
+			type="text"
+			bind:value={inputValue}
+			onkeydown={handleKeydown}
+			class="flex-1 bg-transparent text-text-primary caret-holo outline-none"
+			spellcheck="false"
+			autocomplete="off"
+		/>
 	</div>
 </div>
 

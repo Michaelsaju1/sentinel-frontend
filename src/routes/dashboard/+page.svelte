@@ -1,4 +1,5 @@
 <script lang="ts">
+	// This file was developed with the assistance of Claude Code and Opus 4.6.
 	import {
 		HUDPanel,
 		ProgressBar,
@@ -228,7 +229,7 @@
 					{#each topTickers.slice(0, 6) as t (t.ticker)}
 						<div class="flex items-center justify-between">
 							<a
-								href="/intel/{t.ticker}"
+								href="/stocks/{t.ticker}"
 								class="font-mono text-xs text-holo transition-colors hover:text-holo-bright"
 							>
 								{t.ticker}
@@ -291,7 +292,7 @@
 										@{claim.username}
 									</a>
 									<a
-										href="/intel/{claim.ticker}"
+										href="/stocks/{claim.ticker}"
 										class="font-mono text-[10px] text-text-dim transition-colors hover:text-holo"
 									>
 										{claim.ticker}

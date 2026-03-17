@@ -1,4 +1,5 @@
 <script lang="ts">
+	// This file was developed with the assistance of Claude Code and Opus 4.6.
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 

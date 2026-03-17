@@ -1,4 +1,5 @@
 <script lang="ts">
+	// This file was developed with the assistance of Claude Code and Opus 4.6.
 	import { page } from '$app/state';
 
 	let { apiStatus = 'offline' }: { apiStatus?: string } = $props();
@@ -8,7 +9,7 @@
 	const links = [
 		{ href: '/', label: 'Home' },
 		{ href: '/dashboard', label: 'Feed' },
-		{ href: '/intel', label: 'Stocks' },
+		{ href: '/stocks', label: 'Stocks' },
 		{ href: '/accounts', label: 'Accounts' },
 		{ href: '/leaderboard', label: 'Leaderboard' }
 	];

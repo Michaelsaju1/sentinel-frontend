@@ -1,4 +1,5 @@
 <script lang="ts">
+	// This file was developed with the assistance of Claude Code and Opus 4.6.
 	let { opacity = 0.03 }: { opacity?: number } = $props();
 </script>
 

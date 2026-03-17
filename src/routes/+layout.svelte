@@ -1,4 +1,5 @@
 <script lang="ts">
+	// This file was developed with the assistance of Claude Code and Opus 4.6.
 	import './layout.css';
 	import { browser } from '$app/environment';
 	import favicon from '$lib/assets/favicon.svg';
@@ -9,7 +10,8 @@
 		BootSequence,
 		GlobeNetwork,
 		GlitchText,
-		TypewriterText
+		TypewriterText,
+		TerminalOverlay
 	} from '$lib/components/ui';
 
 	let { data, children } = $props();
@@ -28,6 +30,23 @@
 		booted = true;
 		if (browser) sessionStorage.setItem('sentinel-booted', 'true');
 	}
+
+	const terminalStats = $derived.by(() => {
+		const s = data.stats;
+		if (!s) return null;
+		const total = s.total_claims ?? 0;
+		const accurate = s.label_distribution?.accurate ?? 0;
+		return {
+			totalClaims: total,
+			exaggerated: s.label_distribution?.exaggerated ?? 0,
+			accurate,
+			understated: s.label_distribution?.understated ?? 0,
+			accuracyRate: total > 0 ? ((accurate / total) * 100).toFixed(1) : '0',
+			topTickerCount: s.top_tickers?.length ?? 0,
+			topTickers: s.top_tickers ?? [],
+			topExaggerators: s.most_exaggerated_users ?? []
+		};
+	});
 </script>
 
 <svelte:head>
@@ -36,6 +55,10 @@
 </svelte:head>
 
 <ScanlineOverlay opacity={0.02} />
+
+{#if booted}
+	<TerminalOverlay stats={terminalStats} />
+{/if}
 
 {#if !booted}
 	<!-- Boot gate: blocks ALL pages until boot sequence runs -->

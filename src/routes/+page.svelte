@@ -1,4 +1,5 @@
 <script lang="ts">
+	// This file was developed with the assistance of Claude Code and Opus 4.6.
 	import { onMount } from 'svelte';
 	import {
 		GlobeNetwork,
@@ -161,7 +162,7 @@
 				<div class="grid gap-6 lg:grid-cols-3">
 					<!-- Radar & Status -->
 					<div class="lg:col-span-1">
-						<HUDPanel title="Pipeline Monitor" glow={true}>
+						<HUDPanel title="Pipeline Monitor" glow={true} class="h-full">
 							<div class="flex flex-col items-center gap-4">
 								<RadarScan size={180} />
 								<div class="w-full space-y-3 pt-2">
@@ -180,8 +181,8 @@
 
 					<!-- Terminal -->
 					<div class="lg:col-span-2">
-						<HUDPanel title="System Log">
-							<CommandLine lines={terminalLines} stats={terminalStats} />
+						<HUDPanel title="System Log" class="h-full">
+							<CommandLine lines={terminalLines} stats={terminalStats} class="h-full" />
 						</HUDPanel>
 					</div>
 				</div>

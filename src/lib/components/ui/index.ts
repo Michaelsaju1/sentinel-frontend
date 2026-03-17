@@ -1,3 +1,4 @@
+// This file was developed with the assistance of Claude Code and Opus 4.6.
 export { default as GlobeNetwork } from './GlobeNetwork.svelte';
 export { default as GlitchText } from './GlitchText.svelte';
 export { default as TypewriterText } from './TypewriterText.svelte';
@@ -22,3 +23,4 @@ export { default as CountUp } from './CountUp.svelte';
 export { default as BootSequence } from './BootSequence.svelte';
 export { default as ClaimPopup } from './ClaimPopup.svelte';
 export { default as LabelerToggle } from './LabelerToggle.svelte';
+export { default as TerminalOverlay } from './TerminalOverlay.svelte';
