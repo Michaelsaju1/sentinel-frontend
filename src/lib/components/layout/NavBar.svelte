@@ -7,9 +7,10 @@
 
 	const links = [
 		{ href: '/', label: 'Home' },
-		{ href: '/dashboard', label: 'Dashboard' },
-		{ href: '/intel', label: 'Intel' },
-		{ href: '/about', label: 'Mission' }
+		{ href: '/dashboard', label: 'Feed' },
+		{ href: '/intel', label: 'Stocks' },
+		{ href: '/accounts', label: 'Accounts' },
+		{ href: '/leaderboard', label: 'Leaderboard' }
 	];
 
 	function isActive(href: string): boolean {

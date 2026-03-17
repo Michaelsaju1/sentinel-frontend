@@ -42,16 +42,23 @@ interface Stats {
 		exaggerated: number;
 		understated: number;
 	}[];
+	labels: string;
 }
 
-export const load: PageServerLoad = async ({ fetch }) => {
+export const load: PageServerLoad = async ({ fetch, url }) => {
+	const labels = url.searchParams.get('labels') ?? 'naive';
+
 	try {
-		const [feed, stats] = await Promise.all([
-			apiFetch<Feed>('/api/feed?limit=20', fetch),
-			apiFetch<Stats>('/api/stats', fetch)
-		]);
-		return { feed, stats };
+		const stats = await apiFetch<Stats>(`/api/stats?labels=${labels}`, fetch);
+		const totalClaims = stats.total_claims ?? 0;
+
+		// Fetch the newest page of claims (API returns oldest-first, so offset from end)
+		const pageSize = 50;
+		const offset = Math.max(0, totalClaims - pageSize);
+		const feed = await apiFetch<Feed>(`/api/feed?limit=${pageSize}&offset=${offset}&labels=${labels}`, fetch);
+
+		return { feed, stats, labels };
 	} catch {
-		return { feed: { claims: [], count: 0 }, stats: null };
+		return { feed: { claims: [], count: 0 }, stats: null, labels };
 	}
 };

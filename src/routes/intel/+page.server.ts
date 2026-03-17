@@ -19,16 +19,19 @@ interface Stats {
 		exaggerated: number;
 		understated: number;
 	}[];
+	labels: string;
 }
 
-export const load: PageServerLoad = async ({ fetch }) => {
+export const load: PageServerLoad = async ({ fetch, url }) => {
+	const labels = url.searchParams.get('labels') ?? 'naive';
+
 	try {
 		const [stocks, stats] = await Promise.all([
 			apiFetch<Stocks>('/api/stocks', fetch),
-			apiFetch<Stats>('/api/stats', fetch)
+			apiFetch<Stats>(`/api/stats?labels=${labels}`, fetch)
 		]);
-		return { stocks, stats };
+		return { stocks, stats, labels };
 	} catch {
-		return { stocks: null, stats: null };
+		return { stocks: null, stats: null, labels };
 	}
 };

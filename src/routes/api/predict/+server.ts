@@ -4,8 +4,22 @@ import { apiPost } from '$lib/server/api';
 
 interface PredictResponse {
 	label: string;
+	confidence?: number;
 	model: string;
 	available_models: string[];
+	account?: {
+		username: string;
+		naive?: {
+			grifter_score: number | null;
+			grifter_category: string;
+			total_claims: number;
+		};
+		improved?: {
+			grifter_score: number | null;
+			grifter_category: string;
+			total_claims: number;
+		};
+	};
 }
 
 export const POST: RequestHandler = async ({ request, fetch }) => {

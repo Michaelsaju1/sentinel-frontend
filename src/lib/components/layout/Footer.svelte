@@ -16,7 +16,7 @@
 					<span class="font-display text-xs tracking-[0.25em] text-holo-dim">SENTINEL</span>
 				</div>
 				<p class="font-mono text-xs leading-relaxed text-text-dim">
-					Advanced threat detection and monitoring platform. Protecting digital infrastructure
+					Defense stock credibility platform. Tracking who's right and who's full of it
 					since {year}.
 				</p>
 			</div>
@@ -27,7 +27,7 @@
 					Navigation
 				</h4>
 				<div class="flex flex-col gap-1.5">
-					{#each [{ href: '/', label: 'Home' }, { href: '/dashboard', label: 'Dashboard' }, { href: '/intel', label: 'Intel' }, { href: '/about', label: 'Mission' }] as link (link.href)}
+					{#each [{ href: '/', label: 'Home' }, { href: '/dashboard', label: 'Feed' }, { href: '/intel', label: 'Stocks' }, { href: '/accounts', label: 'Accounts' }, { href: '/leaderboard', label: 'Leaderboard' }] as link (link.href)}
 						<a
 							href={link.href}
 							class="font-mono text-xs text-text-dim transition-colors hover:text-holo"
@@ -46,15 +46,15 @@
 				</h4>
 				<div class="space-y-2 font-mono text-xs">
 					<div class="flex items-center justify-between">
-						<span class="text-text-dim">Core Systems</span>
-						<span class="text-holo">OPERATIONAL</span>
-					</div>
-					<div class="flex items-center justify-between">
-						<span class="text-text-dim">Threat Engine</span>
+						<span class="text-text-dim">Scraper</span>
 						<span class="text-holo">ACTIVE</span>
 					</div>
 					<div class="flex items-center justify-between">
-						<span class="text-text-dim">Data Pipeline</span>
+						<span class="text-text-dim">Labeler</span>
+						<span class="text-holo">ACTIVE</span>
+					</div>
+					<div class="flex items-center justify-between">
+						<span class="text-text-dim">Bot Classifier</span>
 						<span class="text-holo">NOMINAL</span>
 					</div>
 				</div>
@@ -70,7 +70,7 @@
 				&copy; {year} SENTINEL DEFENSE SYSTEMS. CLASSIFIED.
 			</p>
 			<p class="font-mono text-[10px] text-text-dim">
-				SESSION ENCRYPTED // AES-256-GCM // SECURE CHANNEL
+				CREDIBILITY MONITORING // REAL-TIME // BOT-FILTERED
 			</p>
 		</div>
 	</div>
